@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DTF Cuentas Pro</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">DTF Cuentas Pro</p>
+          <h1>Genera cuentas profesionales desde texto plano</h1>
+          <p class="hero-copy">Pega una relación de trabajos, calcula importes por cliente y exporta una cuenta final alineada para WhatsApp o TXT.</p>
+        </div>
+        <div class="hero-actions">
+          <button id="generateBtn" class="btn btn-primary">Generar cuenta</button>
+          <button id="saveRecordBtn" class="btn btn-secondary">Guardar cuenta</button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel stack gap-lg">
+          <div class="section-title-row">
+            <h2>Configuración</h2>
+            <button id="newClientBtn" class="btn btn-secondary btn-sm">+ Nuevo cliente</button>
+          </div>
+
+          <div class="grid two">
+            <label>
+              Cliente / zona
+              <select id="clientSelect"></select>
+            </label>
+            <label>
+              Fecha de entrega
+              <input id="deliveryDate" type="text" placeholder="Ej. 6 de marzo" />
+            </label>
+          </div>
+
+          <div class="grid two">
+            <label>
+              Nuevo bloque por defecto
+              <select id="defaultBlock">
+                <option value="ENCARGOS">ENCARGOS</option>
+                <option value="PEDIDOS">PEDIDOS</option>
+                <option value="PRUEBA">PRUEBA</option>
+              </select>
+            </label>
+            <label>
+              Envío manual (opcional)
+              <input id="manualShipping" type="number" min="0" step="0.01" placeholder="Vacío = usar reglas" />
+            </label>
+          </div>
+
+          <div class="subpanel">
+            <div class="section-title-row">
+              <h3>Tarifas por formato</h3>
+              <button id="addFormatBtn" class="btn btn-secondary btn-sm">+ Añadir formato</button>
+            </div>
+            <div id="formatPrices" class="stack gap-sm"></div>
+          </div>
+
+          <div class="subpanel">
+            <h3>Reglas de envío</h3>
+            <div class="grid three">
+              <label>
+                Modo
+                <select id="shippingMode">
+                  <option value="threshold">Gratis por umbral</option>
+                  <option value="fixed">Siempre fijo</option>
+                  <option value="free">Siempre gratis</option>
+                </select>
+              </label>
+              <label>
+                Umbral gratis (€)
+                <input id="shippingThreshold" type="number" min="0" step="0.01" />
+              </label>
+              <label>
+                Importe envío (€)
+                <input id="shippingFee" type="number" min="0" step="0.01" />
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel stack gap-lg">
+          <h2>Entrada</h2>
+          <label>
+            Pega aquí la relación de trabajos
+            <textarea id="rawInput" rows="14" placeholder="10 A3+(20) BOLA GOKU&#10;5 A3(10) MC QUEEN&#10;1/2 A3+ COCHE ROJO&#10;2 METROS DISEÑO PERSONALIZADO"></textarea>
+          </label>
+
+          <div class="grid two">
+            <label class="file-drop">
+              <span>Subir archivo .txt</span>
+              <input id="txtFileInput" type="file" accept=".txt,text/plain" />
+            </label>
+            <label>
+              Notas adicionales
+              <input id="footerNote" type="text" placeholder="Ej. Cobrado parcialmente" />
+            </label>
+          </div>
+
+          <div class="actions-wrap">
+            <button id="copyBtn" class="btn btn-secondary">Copiar texto final</button>
+            <button id="downloadBtn" class="btn btn-secondary">Descargar .txt</button>
+            <button id="resetBtn" class="btn btn-ghost">Limpiar</button>
+          </div>
+
+          <div>
+            <h3>Errores / avisos</h3>
+            <ul id="issuesList" class="issues-list"></ul>
+          </div>
+        </section>
+
+        <section class="panel stack gap-lg full-width">
+          <div class="section-title-row">
+            <h2>Vista previa editable</h2>
+            <span id="summaryBadge" class="badge">0 líneas</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Bloque</th>
+                  <th>Cantidad</th>
+                  <th>Formato</th>
+                  <th>Paréntesis</th>
+                  <th>Nombre</th>
+                  <th>Precio und.</th>
+                  <th>Total</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="previewTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel stack gap-lg full-width">
+          <div class="section-title-row">
+            <h2>Cuenta final</h2>
+            <span id="totalsBadge" class="badge badge-strong">0.00 €</span>
+          </div>
+          <pre id="outputText" class="output-box"></pre>
+        </section>
+
+        <section class="panel stack gap-lg full-width">
+          <div class="section-title-row">
+            <h2>Historial guardado</h2>
+            <button id="clearHistoryBtn" class="btn btn-ghost btn-sm">Vaciar historial</button>
+          </div>
+          <div id="historyList" class="history-list"></div>
+          <div id="dailySummary" class="history-summary"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
