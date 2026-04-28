@@ -82,7 +82,7 @@
     "testEnvironment": "node"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": "22.x"
   },
   "prisma": {
     "seed": "tsx --require dotenv/config scripts/safe-seed.ts"
