@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import type { Lyric, LyricListResponse, GeneratedLyric, Suggestion, Stats, Video, VideoTemplate, VideoFormat, VideoTemplateId, SubtitleFont } from './types';
 
-const BASE_URL = (process.env.EXPO_PUBLIC_API_URL ?? 'https://161caa99d3.preview.abacusai.app/').replace(/\/+$/, '/');
+const BASE_URL = (process.env.EXPO_PUBLIC_API_URL ?? 'https://compositor-express-1.onrender.com/').replace(/\/+$/, '/');
 
 export const api: AxiosInstance = axios.create({
   baseURL: BASE_URL,
