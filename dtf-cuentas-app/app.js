@@ -59,6 +59,7 @@ function mapElements() {
     batchReviewList: document.getElementById('batchReviewList'),
     batchTotal: document.getElementById('batchTotal'),
     batchCount: document.getElementById('batchCount'),
+    saveClientConfigBtn: document.getElementById('saveClientConfigBtn'),
     generateBtn: document.getElementById('generateBtn'),
     saveRecordBtn: document.getElementById('saveRecordBtn'),
     newClientBtn: document.getElementById('newClientBtn'),
@@ -81,6 +82,7 @@ function init() {
 
 function bindEvents() {
   els.clientSelect.addEventListener('change', () => {
+    saveClientConfig(true);
     state.currentClient = els.clientSelect.value;
     fillClientConfig();
     regenerate();
@@ -100,6 +102,7 @@ function bindEvents() {
   els.clearHistoryBtn.addEventListener('click', clearHistory);
   els.txtFileInput.addEventListener('change', importTxtFile);
   els.batchFileInput.addEventListener('change', importBatchFiles);
+  els.saveClientConfigBtn.addEventListener('click', () => saveClientConfig(false));
   [els.shippingMode, els.shippingThreshold, els.shippingFee].forEach((el) => {
     el.addEventListener('input', saveClientConfigAndRegenerate);
     el.addEventListener('change', saveClientConfigAndRegenerate);
@@ -172,7 +175,13 @@ function renderPriceRows(prices) {
 }
 
 function saveClientConfigAndRegenerate() {
+  saveClientConfig(true);
+  regenerate();
+}
+
+function saveClientConfig(silent = false) {
   const client = state.clients[state.currentClient];
+  if (!client) return;
   const prices = {};
   els.formatPrices.querySelectorAll('[data-format-row]').forEach((row) => {
     const name = normalizeFormat(row.querySelector('.format-name').value);
@@ -186,7 +195,16 @@ function saveClientConfigAndRegenerate() {
     fee: Number(els.shippingFee.value || 0),
   };
   persistClients();
-  regenerate();
+  if (!silent) {
+    const btn = els.saveClientConfigBtn;
+    const oldText = btn.textContent;
+    btn.textContent = 'Guardado ✓';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = oldText;
+      btn.disabled = false;
+    }, 1200);
+  }
 }
 
 function addFormatRow() {

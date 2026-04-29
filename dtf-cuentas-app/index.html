@@ -39,7 +39,10 @@
         <section class="panel stack gap-lg">
           <div class="section-title-row">
             <h2>Configuración</h2>
-            <button id="newClientBtn" class="btn btn-secondary btn-sm">+ Nuevo cliente</button>
+            <div class="actions-wrap">
+              <button id="saveClientConfigBtn" class="btn btn-primary btn-sm">Guardar configuración</button>
+              <button id="newClientBtn" class="btn btn-secondary btn-sm">+ Nuevo cliente</button>
+            </div>
           </div>
 
           <div class="grid two">
@@ -78,6 +81,7 @@
 
           <div class="subpanel">
             <h3>Reglas de envío</h3>
+            <p class="hero-copy compact">Los precios y reglas se guardan por cliente. Puedes cambiarlos hoy y volver a editarlos cuando quieras.</p>
             <div class="grid three">
               <label>
                 Modo
