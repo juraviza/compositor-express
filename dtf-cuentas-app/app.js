@@ -32,6 +32,7 @@ const state = {
 };
 
 const els = mapElements();
+let installPromptEvent = null;
 init();
 
 function mapElements() {
@@ -60,6 +61,7 @@ function mapElements() {
     batchTotal: document.getElementById('batchTotal'),
     batchCount: document.getElementById('batchCount'),
     saveClientConfigBtn: document.getElementById('saveClientConfigBtn'),
+    installAppBtn: document.getElementById('installAppBtn'),
     generateBtn: document.getElementById('generateBtn'),
     saveRecordBtn: document.getElementById('saveRecordBtn'),
     newClientBtn: document.getElementById('newClientBtn'),
@@ -72,6 +74,8 @@ function mapElements() {
 }
 
 function init() {
+  registerServiceWorker();
+  setupInstallPrompt();
   renderClientSelect();
   fillClientConfig();
   renderHistory();
@@ -103,10 +107,42 @@ function bindEvents() {
   els.txtFileInput.addEventListener('change', importTxtFile);
   els.batchFileInput.addEventListener('change', importBatchFiles);
   els.saveClientConfigBtn.addEventListener('click', () => saveClientConfig(false));
+  els.installAppBtn.addEventListener('click', installApp);
   [els.shippingMode, els.shippingThreshold, els.shippingFee].forEach((el) => {
     el.addEventListener('input', saveClientConfigAndRegenerate);
     el.addEventListener('change', saveClientConfigAndRegenerate);
   });
+}
+
+function registerServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+}
+
+function setupInstallPrompt() {
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    installPromptEvent = event;
+    els.installAppBtn.hidden = false;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    installPromptEvent = null;
+    els.installAppBtn.hidden = true;
+    els.installAppBtn.textContent = 'Instalada ✓';
+  });
+}
+
+async function installApp() {
+  if (!installPromptEvent) {
+    alert('Si no aparece el botón de instalación automática, abre esta web en Chrome o Edge y pulsa el icono Instalar de la barra de direcciones.');
+    return;
+  }
+  installPromptEvent.prompt();
+  await installPromptEvent.userChoice;
 }
 
 function loadClients() {

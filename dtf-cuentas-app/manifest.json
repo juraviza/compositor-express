@@ -1,0 +1,18 @@
+{
+  "name": "EspañaDTF · Calculadora de Pedidos DTF",
+  "short_name": "DTF Cuentas",
+  "description": "Calculadora de pedidos DTF instalable en PC para gestionar cuentas, precios y revisiones.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0c0c0f",
+  "theme_color": "#ff6a00",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "./logo-espanadtf.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
