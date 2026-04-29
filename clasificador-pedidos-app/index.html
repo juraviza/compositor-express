@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>App Clasificador de Pedidos</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">APP CLASIFICADOR DE PEDIDOS</p>
+        <h1>Clasifica pedidos de bebidas en segundos</h1>
+        <p class="hero-copy">Pega el pedido del cliente, ordénalo por categorías y corrige lo que haga falta desde móvil o tablet.</p>
+      </div>
+      <div class="hero-actions">
+        <button id="classifyBtn" class="btn btn-primary">Clasificar pedido</button>
+        <button id="copyBtn" class="btn btn-secondary">Copiar resultado</button>
+      </div>
+    </header>
+
+    <section class="stats-strip">
+      <div class="stat-card">
+        <span class="stat-label">Líneas</span>
+        <strong id="linesBadge" class="stat-value">0</strong>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Categorías</span>
+        <strong id="categoriesBadge" class="stat-value">0</strong>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Productos</span>
+        <strong id="productsBadge" class="stat-value">0</strong>
+      </div>
+    </section>
+
+    <main class="layout">
+      <section class="panel stack gap-lg">
+        <h2>Pedido en bruto</h2>
+        <label>
+          Pega o escribe el pedido
+          <textarea id="rawInput" rows="18" placeholder="4 Puerto de Indias&#10;1 Larios normal&#10;6 Seagram&#10;24 Barceló&#10;20 Coca Cola&#10;12 Cruzcampo"></textarea>
+        </label>
+        <div class="actions-wrap">
+          <label class="file-drop">
+            <span>Subir .txt</span>
+            <input id="txtFileInput" type="file" accept=".txt,text/plain" />
+          </label>
+          <button id="resetBtn" class="btn btn-ghost">Limpiar</button>
+        </div>
+        <div>
+          <h3>Avisos</h3>
+          <ul id="issuesList" class="issues-list"></ul>
+        </div>
+      </section>
+
+      <section class="panel stack gap-lg">
+        <h2>Clasificación</h2>
+        <div id="categoryCards" class="category-cards"></div>
+      </section>
+
+      <section class="panel stack gap-lg full-width">
+        <div class="section-title-row">
+          <h2>Revisión manual</h2>
+          <span class="badge">Editable</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Cantidad</th>
+                <th>Producto</th>
+                <th>Categoría</th>
+              </tr>
+            </thead>
+            <tbody id="previewTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel stack gap-lg full-width">
+        <div class="section-title-row">
+          <h2>Texto final</h2>
+          <button id="whatsBtn" class="btn btn-secondary btn-sm">Preparar para WhatsApp</button>
+        </div>
+        <pre id="outputText" class="output-box">Aquí aparecerá el pedido clasificado.</pre>
+      </section>
+    </main>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
