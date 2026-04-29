@@ -20,6 +20,21 @@
         </div>
       </header>
 
+      <section class="stats-strip">
+        <div class="stat-card">
+          <span class="stat-label">Cliente activo</span>
+          <strong id="activeClientBadge" class="stat-value">Bilbao</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Líneas procesadas</span>
+          <strong id="summaryBadge" class="stat-value">0 líneas</strong>
+        </div>
+        <div class="stat-card stat-card-success">
+          <span class="stat-label">Total actual</span>
+          <strong id="totalsBadge" class="stat-value">0.00 €</strong>
+        </div>
+      </section>
+
       <main class="layout">
         <section class="panel stack gap-lg">
           <div class="section-title-row">
@@ -117,7 +132,7 @@
         <section class="panel stack gap-lg full-width">
           <div class="section-title-row">
             <h2>Vista previa editable</h2>
-            <span id="summaryBadge" class="badge">0 líneas</span>
+            <span class="badge">Editable al instante</span>
           </div>
           <div class="table-wrap">
             <table>
@@ -141,9 +156,30 @@
         <section class="panel stack gap-lg full-width">
           <div class="section-title-row">
             <h2>Cuenta final</h2>
-            <span id="totalsBadge" class="badge badge-strong">0.00 €</span>
+            <span class="badge badge-strong">Texto monoespaciado listo</span>
           </div>
+          <div class="helper-note">Las líneas con <strong>MUESTRA</strong>, <strong>SIN CARGO</strong> o <strong>PRUEBA</strong> se calculan automáticamente a 0 €.</div>
           <pre id="outputText" class="output-box"></pre>
+        </section>
+
+        <section class="panel stack gap-lg full-width">
+          <div class="section-title-row">
+            <h2>Revisión de varias cuentas finalizadas</h2>
+            <span class="badge">Nuevo</span>
+          </div>
+          <p class="hero-copy compact">Sube varios archivos .txt ya terminados y la app extraerá sus totales para darte una suma final general.</p>
+          <div class="grid two">
+            <label class="file-drop">
+              <span>Subir varias cuentas .txt</span>
+              <input id="batchFileInput" type="file" accept=".txt,text/plain" multiple />
+            </label>
+            <div class="subpanel compact-panel">
+              <h3>Total conjunto</h3>
+              <div id="batchTotal" class="batch-total">0.00 €</div>
+              <div id="batchCount" class="muted-copy">0 cuentas revisadas</div>
+            </div>
+          </div>
+          <div id="batchReviewList" class="history-list"></div>
         </section>
 
         <section class="panel stack gap-lg full-width">

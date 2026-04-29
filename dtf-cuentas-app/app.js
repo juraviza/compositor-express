@@ -28,6 +28,7 @@ const state = {
   parsedLines: [],
   issues: [],
   lastOutput: '',
+  batchReviews: [],
 };
 
 const els = mapElements();
@@ -53,6 +54,11 @@ function mapElements() {
     dailySummary: document.getElementById('dailySummary'),
     summaryBadge: document.getElementById('summaryBadge'),
     totalsBadge: document.getElementById('totalsBadge'),
+    activeClientBadge: document.getElementById('activeClientBadge'),
+    batchFileInput: document.getElementById('batchFileInput'),
+    batchReviewList: document.getElementById('batchReviewList'),
+    batchTotal: document.getElementById('batchTotal'),
+    batchCount: document.getElementById('batchCount'),
     generateBtn: document.getElementById('generateBtn'),
     saveRecordBtn: document.getElementById('saveRecordBtn'),
     newClientBtn: document.getElementById('newClientBtn'),
@@ -68,6 +74,7 @@ function init() {
   renderClientSelect();
   fillClientConfig();
   renderHistory();
+  renderBatchReviews();
   bindEvents();
   regenerate();
 }
@@ -92,6 +99,7 @@ function bindEvents() {
   els.addFormatBtn.addEventListener('click', addFormatRow);
   els.clearHistoryBtn.addEventListener('click', clearHistory);
   els.txtFileInput.addEventListener('change', importTxtFile);
+  els.batchFileInput.addEventListener('change', importBatchFiles);
   [els.shippingMode, els.shippingThreshold, els.shippingFee].forEach((el) => {
     el.addEventListener('input', saveClientConfigAndRegenerate);
     el.addEventListener('change', saveClientConfigAndRegenerate);
@@ -134,6 +142,7 @@ function renderClientSelect() {
 function fillClientConfig() {
   const client = state.clients[state.currentClient];
   if (!client) return;
+  els.activeClientBadge.textContent = client.name || state.currentClient;
   renderPriceRows(client.prices);
   els.shippingMode.value = client.shipping.mode;
   els.shippingThreshold.value = client.shipping.threshold ?? 100;
@@ -215,6 +224,18 @@ function importTxtFile(event) {
   reader.readAsText(file, 'utf-8');
 }
 
+async function importBatchFiles(event) {
+  const files = Array.from(event.target.files || []);
+  if (!files.length) return;
+  const reviews = [];
+  for (const file of files) {
+    const content = await file.text();
+    reviews.push(analyzeFinishedAccount(file.name, content));
+  }
+  state.batchReviews = reviews;
+  renderBatchReviews();
+}
+
 function resetInput() {
   els.rawInput.value = '';
   els.footerNote.value = '';
@@ -251,6 +272,23 @@ function parseLines(lines, priceMap, defaultBlock) {
     const match = cleanLine.match(/^(\d+(?:[.,]\d+)?|\d+\/\d+)\s+([A-Z0-9+]+|METROS?|METRO)\s*(?:\(([^)]+)\))?\s+(.+)$/i);
 
     if (!match) {
+      const simpleStatusMatch = line.match(/^(SIN CARGO|MUESTRA|PRUEBA)\s+(.+)$/i);
+      if (simpleStatusMatch) {
+        items.push({
+          id: crypto.randomUUID(),
+          block: currentBlock,
+          rawLine: line,
+          quantity: 1,
+          quantityDisplay: '1',
+          format: 'VARIOS',
+          paren: '',
+          name: simpleStatusMatch[2].trim(),
+          unitPrice: 0,
+          total: 0,
+          status: simpleStatusMatch[1].toUpperCase(),
+        });
+        return;
+      }
       issues.push({ type: 'error', text: `Línea ${index + 1}: no se pudo interpretar -> "${line}"` });
       return;
     }
@@ -477,6 +515,50 @@ function renderDailySummary() {
     .sort((a, b) => b[0].localeCompare(a[0]))
     .map(([day, total]) => `${day}: ${formatCurrency(total)}`);
   els.dailySummary.textContent = rows.length ? `Resumen por días\n${rows.join('\n')}` : 'Sin cuentas guardadas todavía.';
+}
+
+function analyzeFinishedAccount(fileName, content) {
+  const lines = String(content).split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const totalLine = [...lines].reverse().find((line) => /^TOTAL\s*:/i.test(line) || /^TOTAL\b/i.test(line));
+  const shippingLine = [...lines].reverse().find((line) => /^ENV[ÍI]O\s*:/i.test(line) || /^ENV[ÍI]O\b/i.test(line));
+  const subtotalLine = [...lines].reverse().find((line) => /^SUBTOTAL\s*:/i.test(line) || /^SUBTOTAL\b/i.test(line));
+  const total = extractMoney(totalLine);
+  const shipping = extractMoney(shippingLine);
+  const subtotal = extractMoney(subtotalLine);
+  return {
+    fileName,
+    total,
+    shipping,
+    subtotal,
+    ok: total !== null,
+    message: total !== null ? 'Total detectado correctamente' : 'No se encontró una línea TOTAL válida',
+  };
+}
+
+function renderBatchReviews() {
+  const totalSum = state.batchReviews.reduce((sum, item) => sum + (item.total || 0), 0);
+  els.batchTotal.textContent = formatCurrency(totalSum);
+  els.batchCount.textContent = `${state.batchReviews.length} cuenta${state.batchReviews.length === 1 ? '' : 's'} revisada${state.batchReviews.length === 1 ? '' : 's'}`;
+  els.batchReviewList.innerHTML = state.batchReviews.map((item) => `
+    <div class="history-item">
+      <div>
+        <strong>${escapeHtml(item.fileName)}</strong>
+        <div><small>${escapeHtml(item.message)}</small></div>
+        <div><small>Subtotal: ${item.subtotal !== null ? formatCurrency(item.subtotal) : 'No detectado'} · Envío: ${item.shipping !== null ? formatCurrency(item.shipping) : 'No detectado'}</small></div>
+      </div>
+      <div>
+        <strong>${item.ok ? formatCurrency(item.total) : 'Revisar'}</strong>
+      </div>
+    </div>
+  `).join('') || '<div class="history-item"><div><strong>Aún no has subido cuentas</strong><div><small>Sube varios .txt terminados y aquí verás la suma final.</small></div></div></div>';
+}
+
+function extractMoney(line) {
+  if (!line) return null;
+  const match = String(line).match(/(-?\d+(?:[.,]\d{1,2})?)\s*€?/);
+  if (!match) return null;
+  const value = Number(match[1].replace(',', '.'));
+  return Number.isFinite(value) ? value : null;
 }
 
 function loadRecord(id) {
