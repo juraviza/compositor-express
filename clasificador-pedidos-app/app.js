@@ -1,5 +1,5 @@
 const CATEGORY_OPTIONS = [
-  'Bebidas alcohólicas', 'Cervezas', 'Refrescos', 'Aguas y energéticas', 'Cocina y despensa', 'Limpieza e higiene', 'Otros'
+  'Bebidas alcohólicas', 'Cervezas', 'Refrescos', 'Cocina y despensa', 'Limpieza e higiene', 'Otros'
 ];
 
 const DEFAULT_PRODUCT_MEMORY = {
@@ -86,15 +86,15 @@ const DEFAULT_PRODUCT_MEMORY = {
   'águila': 'Cervezas',
   'alhambra': 'Cervezas',
   'san miguel': 'Cervezas',
-  'agua': 'Aguas y energéticas',
-  'font vella': 'Aguas y energéticas',
-  'lanjaron': 'Aguas y energéticas',
-  'lanjaron': 'Aguas y energéticas',
-  'cabreiroa': 'Aguas y energéticas',
-  'monster': 'Aguas y energéticas',
-  'red bull': 'Aguas y energéticas',
-  'burn': 'Aguas y energéticas',
-  'aquabona': 'Aguas y energéticas',
+  'agua': 'Refrescos',
+  'font vella': 'Refrescos',
+  'lanjaron': 'Refrescos',
+  'lanjaron': 'Refrescos',
+  'cabreiroa': 'Refrescos',
+  'monster': 'Refrescos',
+  'red bull': 'Refrescos',
+  'burn': 'Refrescos',
+  'aquabona': 'Refrescos',
   'tomate frito': 'Cocina y despensa',
   'tomate triturado': 'Cocina y despensa',
   'tomate pelado': 'Cocina y despensa',
@@ -177,7 +177,7 @@ const KEYWORDS = [
   { category: 'Bebidas alcohólicas', terms: ['absolut', 'smirnoff', 'ciroc', 'cîroc', 'bailes', 'baileys', 'tequila', 'jager', 'jäger', 'maria brizard', 'maría brizar', 'anis del mono', 'anís del mono', 'licor 43', 'vodca', 'vodka', 'licor'] },
   { category: 'Refrescos', terms: ['coca cola', 'cocacola', 'fanta', 'sprite', 'tonica', 'tónica', 'limonada', 'neste', 'nestea', 'aquarios', 'aquarius', 'kas', 'zero'] },
   { category: 'Cervezas', terms: ['cruzcampo', 'heineken', 'heniker', 'radler', 'aguila', 'águila', 'estrella', 'victoria', 'mahou', 'amstel', 'alhambra', 'san miguel', 'cerveza', 'barril'] },
-  { category: 'Aguas y energéticas', terms: ['agua', 'monster', 'moster', 'red bull', 'burn', 'font vella', 'lanjaron', 'lanjaron', 'cabreiroa', 'aquabona'] },
+  { category: 'Refrescos', terms: ['agua', 'monster', 'moster', 'red bull', 'burn', 'font vella', 'lanjaron', 'lanjaron', 'cabreiroa', 'aquabona'] },
   { category: 'Bebidas alcohólicas', terms: ['martini', 'miura', 'vermut', 'rioja', 'ribera', 'lambrusco', 'vino'] },
   { category: 'Cocina y despensa', terms: ['tomate', 'alcachof', 'champiñ', 'champiñ', 'esparrag', 'maiz', 'maíz', 'zanahoria', 'atun', 'atún', 'aceituna', 'pepinillo', 'piquillo', 'espinaca', 'garbanzo', 'judia', 'judía', 'lenteja', 'aceite', 'vinagre', 'sal', 'azucar', 'azúcar', 'harina', 'arroz', 'pasta', 'queso', 'mozzarella', 'mayonesa', 'ketchup', 'mostaza', 'salsa', 'caldo', 'nata cocinar', 'leche evaporada', 'huevo', 'patata'] },
   { category: 'Limpieza e higiene', terms: ['lejia', 'lejía', 'amoniaco', 'friegasuelos', 'detergente', 'lavavajillas', 'fairy', 'mistol', 'desengrasante', 'limpiacristales', 'papel higienico', 'papel higiénico', 'papel cocina', 'servilleta', 'bayeta', 'estropajo', 'guante', 'gel de manos', 'jabon de manos', 'jabón de manos', 'gel hidroalcoholico', 'gel hidroalcohólico', 'ambientador', 'secamanos'] },
