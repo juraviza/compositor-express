@@ -1,5 +1,5 @@
 const CATEGORY_OPTIONS = [
-  'Bebidas alcohólicas', 'Refrescos', 'Aguas y energéticas', 'Cocina y despensa', 'Limpieza e higiene', 'Otros'
+  'Bebidas alcohólicas', 'Cervezas', 'Refrescos', 'Aguas y energéticas', 'Cocina y despensa', 'Limpieza e higiene', 'Otros'
 ];
 
 const DEFAULT_PRODUCT_MEMORY = {
@@ -74,18 +74,18 @@ const DEFAULT_PRODUCT_MEMORY = {
   'tónica': 'Refrescos',
   'kas limon': 'Refrescos',
   'kas limón': 'Refrescos',
-  'cruzcampo': 'Bebidas alcohólicas',
-  'heineken': 'Bebidas alcohólicas',
-  'estrella': 'Bebidas alcohólicas',
-  'estrella galicia': 'Bebidas alcohólicas',
-  'victoria': 'Bebidas alcohólicas',
-  'mahou': 'Bebidas alcohólicas',
-  'amstel': 'Bebidas alcohólicas',
-  'radler': 'Bebidas alcohólicas',
-  'aguila': 'Bebidas alcohólicas',
-  'águila': 'Bebidas alcohólicas',
-  'alhambra': 'Bebidas alcohólicas',
-  'san miguel': 'Bebidas alcohólicas',
+  'cruzcampo': 'Cervezas',
+  'heineken': 'Cervezas',
+  'estrella': 'Cervezas',
+  'estrella galicia': 'Cervezas',
+  'victoria': 'Cervezas',
+  'mahou': 'Cervezas',
+  'amstel': 'Cervezas',
+  'radler': 'Cervezas',
+  'aguila': 'Cervezas',
+  'águila': 'Cervezas',
+  'alhambra': 'Cervezas',
+  'san miguel': 'Cervezas',
   'agua': 'Aguas y energéticas',
   'font vella': 'Aguas y energéticas',
   'lanjaron': 'Aguas y energéticas',
@@ -176,7 +176,7 @@ const KEYWORDS = [
   { category: 'Bebidas alcohólicas', terms: ['ballant', 'ballantais', 'jyb', 'j&b', 'white label', 'joni', 'johnnie', 'joni rojo', 'joni negro', 'cien piper', '100 pipers', 'passport', 'dyc', 'jameson', 'macallan', 'whisky'] },
   { category: 'Bebidas alcohólicas', terms: ['absolut', 'smirnoff', 'ciroc', 'cîroc', 'bailes', 'baileys', 'tequila', 'jager', 'jäger', 'maria brizard', 'maría brizar', 'anis del mono', 'anís del mono', 'licor 43', 'vodca', 'vodka', 'licor'] },
   { category: 'Refrescos', terms: ['coca cola', 'cocacola', 'fanta', 'sprite', 'tonica', 'tónica', 'limonada', 'neste', 'nestea', 'aquarios', 'aquarius', 'kas', 'zero'] },
-  { category: 'Bebidas alcohólicas', terms: ['cruzcampo', 'heineken', 'heniker', 'radler', 'aguila', 'águila', 'estrella', 'victoria', 'mahou', 'amstel', 'alhambra', 'san miguel', 'cerveza', 'barril'] },
+  { category: 'Cervezas', terms: ['cruzcampo', 'heineken', 'heniker', 'radler', 'aguila', 'águila', 'estrella', 'victoria', 'mahou', 'amstel', 'alhambra', 'san miguel', 'cerveza', 'barril'] },
   { category: 'Aguas y energéticas', terms: ['agua', 'monster', 'moster', 'red bull', 'burn', 'font vella', 'lanjaron', 'lanjaron', 'cabreiroa', 'aquabona'] },
   { category: 'Bebidas alcohólicas', terms: ['martini', 'miura', 'vermut', 'rioja', 'ribera', 'lambrusco', 'vino'] },
   { category: 'Cocina y despensa', terms: ['tomate', 'alcachof', 'champiñ', 'champiñ', 'esparrag', 'maiz', 'maíz', 'zanahoria', 'atun', 'atún', 'aceituna', 'pepinillo', 'piquillo', 'espinaca', 'garbanzo', 'judia', 'judía', 'lenteja', 'aceite', 'vinagre', 'sal', 'azucar', 'azúcar', 'harina', 'arroz', 'pasta', 'queso', 'mozzarella', 'mayonesa', 'ketchup', 'mostaza', 'salsa', 'caldo', 'nata cocinar', 'leche evaporada', 'huevo', 'patata'] },
