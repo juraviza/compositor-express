@@ -132,14 +132,22 @@ function preprocessRawText(raw) {
 function normalizeOcrLine(line) {
   return String(line)
     .replace(/[“”"']/g, '')
+    .replace(/[–—]+/g, '-')
     .replace(/\s*[-=:>]+\s*/g, ' ')
-    .replace(/^([A-Za-zÁÉÍÓÚÜÑáéíóúüñ].*?)\s+(\d+)\s*(cajas?|caja|latas?|lata|uds?|ud|garrafas?|garrafas?)$/i, '$2 $1')
+    .replace(/^([A-Za-zÁÉÍÓÚÜÑáéíóúüñ][A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 .,+&/-]*?)\s+(\d+)\s*(cajas?|caja|latas?|lata|uds?|ud|unid(?:ades?)?|und|garrafas?|garrafa|botellas?|botella)?$/i, '$2 $1')
+    .replace(/^([A-Za-zÁÉÍÓÚÜÑáéíóúüñ][A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 .,+&/-]*?)\s*[x×]\s*(\d+)$/i, '$2 $1')
     .replace(/^(\D+?)\s+(\d+)$/i, '$2 $1')
     .replace(/\bAquarios\b/gi, 'Aquarius')
     .replace(/\bHeniker\b/gi, 'Heineken')
     .replace(/\bBefeter\b/gi, 'Beefeater')
     .replace(/\bSegram\b/gi, 'Seagram')
     .replace(/\bMoster\b/gi, 'Monster')
+    .replace(/\bund\b/gi, '')
+    .replace(/\bud\b/gi, '')
+    .replace(/\bunid(?:ad|ades)?\b/gi, '')
+    .replace(/\bcaja\b/gi, '')
+    .replace(/\bcajas\b/gi, '')
+    .replace(/\s{2,}/g, ' ')
     .trim();
 }
 

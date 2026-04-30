@@ -41,7 +41,7 @@ app.post('/api/read-order', upload.single('image'), async (req, res) => {
           content: [
             {
               type: 'input_text',
-              text: `Lee esta foto de un pedido manuscrito de bebidas. Devuelve SOLO JSON válido con esta forma exacta: {"lines":["2 coca cola","1 larios"],"notes":["texto dudoso si hace falta"]}. Reglas: 1) una línea por producto, 2) intenta corregir nombres evidentes de bebidas, 3) si la cantidad no está clara, asume 1 y añádelo en notes, 4) no expliques nada fuera del JSON.`
+              text: `Lee esta foto de un pedido manuscrito de bebidas. Devuelve SOLO JSON válido con esta forma exacta: {"lines":["2 coca cola","1 larios"],"notes":["texto dudoso si hace falta"]}. Reglas: 1) una línea por producto, 2) intenta corregir nombres evidentes de bebidas, 3) si la cantidad no está clara, asume 1 y añádelo en notes, 4) interpreta correctamente formatos como "Beefeater 1 caja", "Beefeater ---- 1 caja", "Beefeater 1 und", "Coca Cola x 2" y devuelve siempre la cantidad al principio, 5) ignora palabras de unidad como caja, und, ud, unidad, botellas si no aportan categoría, 6) no expliques nada fuera del JSON.`
             },
             {
               type: 'input_image',
