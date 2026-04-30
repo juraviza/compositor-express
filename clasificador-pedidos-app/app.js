@@ -2,7 +2,7 @@ const CATEGORY_OPTIONS = [
   'Ginebras', 'Rones', 'Whiskies', 'Vodkas y licores', 'Refrescos', 'Cervezas', 'Aguas y energéticas', 'Vinos y vermut', 'Cocina y despensa', 'Limpieza e higiene', 'Otros'
 ];
 
-const PRODUCT_MEMORY = {
+const DEFAULT_PRODUCT_MEMORY = {
   'beefeater': 'Ginebras',
   'larios': 'Ginebras',
   'larios 12': 'Ginebras',
@@ -183,6 +183,9 @@ const KEYWORDS = [
   { category: 'Limpieza e higiene', terms: ['lejia', 'lejía', 'amoniaco', 'friegasuelos', 'detergente', 'lavavajillas', 'fairy', 'mistol', 'desengrasante', 'limpiacristales', 'papel higienico', 'papel higiénico', 'papel cocina', 'servilleta', 'bayeta', 'estropajo', 'guante', 'gel de manos', 'jabon de manos', 'jabón de manos', 'gel hidroalcoholico', 'gel hidroalcohólico', 'ambientador', 'secamanos'] },
 ];
 
+const PRODUCT_MEMORY_STORAGE_KEY = 'caniapp-product-memory-v1';
+const PRODUCT_MEMORY = loadProductMemory();
+
 const state = {
   items: [],
   issues: [],
@@ -210,9 +213,15 @@ const els = {
   linesBadge: document.getElementById('linesBadge'),
   categoriesBadge: document.getElementById('categoriesBadge'),
   productsBadge: document.getElementById('productsBadge'),
+  memoryProductInput: document.getElementById('memoryProductInput'),
+  memoryCategoryInput: document.getElementById('memoryCategoryInput'),
+  saveMemoryBtn: document.getElementById('saveMemoryBtn'),
+  memoryStatus: document.getElementById('memoryStatus'),
+  memoryTableBody: document.getElementById('memoryTableBody'),
 };
 
 bindEvents();
+setupMemoryEditor();
 classify();
 
 function bindEvents() {
@@ -223,6 +232,7 @@ function bindEvents() {
   els.txtFileInput.addEventListener('change', importTxtFile);
   els.imageInput.addEventListener('change', handleImageSelected);
   els.ocrBtn.addEventListener('click', runOCRFromSelectedImage);
+  els.saveMemoryBtn.addEventListener('click', saveMemoryProduct);
 }
 
 function importTxtFile(event) {
@@ -338,6 +348,7 @@ function renderAll() {
   renderTable();
   renderOutput();
   renderStats();
+  renderMemoryTable();
 }
 
 function renderIssues() {
@@ -479,6 +490,50 @@ function readFileAsDataUrl(file) {
 function copyOutput() {
   if (!state.lastOutput) return;
   navigator.clipboard.writeText(state.lastOutput);
+}
+
+function setupMemoryEditor() {
+  els.memoryCategoryInput.innerHTML = CATEGORY_OPTIONS
+    .filter((option) => option !== 'Otros')
+    .map((option) => `<option value="${escapeAttr(option)}">${escapeHtml(option)}</option>`)
+    .join('');
+  renderMemoryTable();
+}
+
+function saveMemoryProduct() {
+  const product = normalizeProduct(els.memoryProductInput.value).toLowerCase();
+  const category = els.memoryCategoryInput.value;
+
+  if (!product) {
+    els.memoryStatus.textContent = 'Escribe primero el nombre del producto.';
+    return;
+  }
+
+  PRODUCT_MEMORY[product] = category;
+  localStorage.setItem(PRODUCT_MEMORY_STORAGE_KEY, JSON.stringify(PRODUCT_MEMORY));
+  els.memoryProductInput.value = '';
+  els.memoryStatus.textContent = `Guardado: ${product} → ${category}`;
+  renderMemoryTable();
+  classify();
+}
+
+function renderMemoryTable() {
+  const entries = Object.entries(PRODUCT_MEMORY).sort((a, b) => a[0].localeCompare(b[0], 'es'));
+  els.memoryTableBody.innerHTML = entries.map(([product, category]) => `
+    <tr>
+      <td>${escapeHtml(product)}</td>
+      <td>${escapeHtml(category)}</td>
+    </tr>
+  `).join('');
+}
+
+function loadProductMemory() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PRODUCT_MEMORY_STORAGE_KEY) || '{}');
+    return { ...DEFAULT_PRODUCT_MEMORY, ...saved };
+  } catch {
+    return { ...DEFAULT_PRODUCT_MEMORY };
+  }
 }
 
 function escapeHtml(str) {

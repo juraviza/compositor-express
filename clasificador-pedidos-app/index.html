@@ -90,6 +90,39 @@
 
       <section class="panel stack gap-lg full-width">
         <div class="section-title-row">
+          <h2>Memoria de productos</h2>
+          <span class="badge">Muy fácil</span>
+        </div>
+        <p class="helper-text">Si aparece un producto nuevo, escríbelo aquí una sola vez y la app lo recordará para la próxima.</p>
+        <div class="memory-form-grid">
+          <label>
+            Nombre del producto
+            <input id="memoryProductInput" type="text" placeholder="Ejemplo: Seven Up" />
+          </label>
+          <label>
+            Categoría
+            <select id="memoryCategoryInput"></select>
+          </label>
+        </div>
+        <div class="actions-wrap">
+          <button id="saveMemoryBtn" class="btn btn-primary">Guardar producto en memoria</button>
+        </div>
+        <div id="memoryStatus" class="ocr-status">Aquí verás si el producto se ha guardado bien.</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Producto guardado</th>
+                <th>Categoría</th>
+              </tr>
+            </thead>
+            <tbody id="memoryTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel stack gap-lg full-width">
+        <div class="section-title-row">
           <h2>Texto final</h2>
           <button id="whatsBtn" class="btn btn-secondary btn-sm">Preparar para WhatsApp</button>
         </div>
