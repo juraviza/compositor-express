@@ -17,11 +17,18 @@ const state = {
   items: [],
   issues: [],
   lastOutput: '',
+  imageDataUrl: '',
+  ocrRunning: false,
 };
 
 const els = {
   rawInput: document.getElementById('rawInput'),
   txtFileInput: document.getElementById('txtFileInput'),
+  imageInput: document.getElementById('imageInput'),
+  imagePreviewWrap: document.getElementById('imagePreviewWrap'),
+  imagePreview: document.getElementById('imagePreview'),
+  ocrBtn: document.getElementById('ocrBtn'),
+  ocrStatus: document.getElementById('ocrStatus'),
   classifyBtn: document.getElementById('classifyBtn'),
   copyBtn: document.getElementById('copyBtn'),
   resetBtn: document.getElementById('resetBtn'),
@@ -44,6 +51,8 @@ function bindEvents() {
   els.resetBtn.addEventListener('click', resetAll);
   els.whatsBtn.addEventListener('click', copyOutput);
   els.txtFileInput.addEventListener('change', importTxtFile);
+  els.imageInput.addEventListener('change', handleImageSelected);
+  els.ocrBtn.addEventListener('click', runOCRFromSelectedImage);
 }
 
 function importTxtFile(event) {
@@ -61,14 +70,16 @@ function resetAll() {
   els.rawInput.value = '';
   state.items = [];
   state.issues = [];
+  state.imageDataUrl = '';
+  els.imageInput.value = '';
+  els.imagePreview.src = '';
+  els.imagePreviewWrap.hidden = true;
+  setOcrStatus('Puedes subir una foto escrita a mano y la app intentará pasarla a texto.');
   renderAll();
 }
 
 function classify() {
-  const lines = String(els.rawInput.value || '')
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
+  const lines = preprocessRawText(els.rawInput.value || '');
 
   const items = [];
   const issues = [];
@@ -103,6 +114,32 @@ function classify() {
 function normalizeProduct(value) {
   return String(value)
     .replace(/\s+/g, ' ')
+    .replace(/[|]/g, 'l')
+    .replace(/[º]/g, 'o')
+    .trim();
+}
+
+function preprocessRawText(raw) {
+  return String(raw || '')
+    .replace(/[;,]+/g, '\n')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map(normalizeOcrLine)
+    .filter(Boolean);
+}
+
+function normalizeOcrLine(line) {
+  return String(line)
+    .replace(/[“”"']/g, '')
+    .replace(/\s*[-=:>]+\s*/g, ' ')
+    .replace(/^([A-Za-zÁÉÍÓÚÜÑáéíóúüñ].*?)\s+(\d+)\s*(cajas?|caja|latas?|lata|uds?|ud|garrafas?|garrafas?)$/i, '$2 $1')
+    .replace(/^(\D+?)\s+(\d+)$/i, '$2 $1')
+    .replace(/\bAquarios\b/gi, 'Aquarius')
+    .replace(/\bHeniker\b/gi, 'Heineken')
+    .replace(/\bBefeter\b/gi, 'Beefeater')
+    .replace(/\bSegram\b/gi, 'Seagram')
+    .replace(/\bMoster\b/gi, 'Monster')
     .trim();
 }
 
@@ -194,6 +231,70 @@ function groupByCategory(items) {
     (grouped[item.category] ||= []).push(item);
   });
   return grouped;
+}
+
+async function handleImageSelected(event) {
+  const [file] = event.target.files || [];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    state.imageDataUrl = String(reader.result || '');
+    els.imagePreview.src = state.imageDataUrl;
+    els.imagePreviewWrap.hidden = false;
+    setOcrStatus('Foto cargada. Pulsa "Leer foto" para convertirla a texto.');
+  };
+  reader.readAsDataURL(file);
+}
+
+async function runOCRFromSelectedImage() {
+  if (!state.imageDataUrl) {
+    setOcrStatus('Primero sube una foto del pedido.');
+    return;
+  }
+  if (!window.Tesseract) {
+    setOcrStatus('No se ha cargado el lector OCR.');
+    return;
+  }
+  if (state.ocrRunning) return;
+  state.ocrRunning = true;
+  els.ocrBtn.disabled = true;
+  setOcrStatus('Leyendo la foto... puede tardar unos segundos.');
+  try {
+    const result = await window.Tesseract.recognize(state.imageDataUrl, 'spa', {
+      logger: (msg) => {
+        if (msg.status === 'recognizing text' && typeof msg.progress === 'number') {
+          setOcrStatus(`Leyendo la foto... ${Math.round(msg.progress * 100)}%`);
+        }
+      }
+    });
+    const text = cleanOcrText(result?.data?.text || '');
+    if (!text.trim()) {
+      setOcrStatus('No he podido sacar texto útil de la foto. Prueba con una imagen más clara.');
+      return;
+    }
+    els.rawInput.value = text;
+    setOcrStatus('Foto convertida a texto. Revisa el resultado y pulsa clasificar si hace falta.');
+    classify();
+  } catch (error) {
+    setOcrStatus('Hubo un problema al leer la foto. Prueba con otra más nítida.');
+  } finally {
+    state.ocrRunning = false;
+    els.ocrBtn.disabled = false;
+  }
+}
+
+function cleanOcrText(text) {
+  return String(text || '')
+    .replace(/\r/g, '\n')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => line.replace(/[{}]/g, '').replace(/\s{2,}/g, ' '))
+    .join('\n');
+}
+
+function setOcrStatus(message) {
+  els.ocrStatus.textContent = message;
 }
 
 function copyOutput() {

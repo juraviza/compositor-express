@@ -47,7 +47,16 @@
             <span>Subir .txt</span>
             <input id="txtFileInput" type="file" accept=".txt,text/plain" />
           </label>
+          <label class="file-drop">
+            <span>Subir foto del pedido</span>
+            <input id="imageInput" type="file" accept="image/*" capture="environment" />
+          </label>
+          <button id="ocrBtn" class="btn btn-secondary">Leer foto</button>
           <button id="resetBtn" class="btn btn-ghost">Limpiar</button>
+        </div>
+        <div id="ocrStatus" class="ocr-status">Puedes subir una foto escrita a mano y la app intentará pasarla a texto.</div>
+        <div id="imagePreviewWrap" class="image-preview" hidden>
+          <img id="imagePreview" alt="Vista previa del pedido" />
         </div>
         <div>
           <h3>Avisos</h3>
@@ -89,6 +98,7 @@
     </main>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>
