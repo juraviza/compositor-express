@@ -34,7 +34,7 @@ app.post('/api/read-order', upload.array('images', 6), async (req, res) => {
     const content = [
       {
         type: 'input_text',
-        text: `Lee estas fotos de un pedido manuscrito de bebidas. Devuelve SOLO JSON válido con esta forma exacta: {"lines":["2 coca cola","1 larios"],"notes":["texto dudoso si hace falta"],"uncertainLines":["línea que no se entiende bien"]}. Reglas: 1) una línea por producto, 2) intenta corregir nombres evidentes de bebidas, 3) si la cantidad no está clara, asume 1 y añádelo en notes, 4) interpreta correctamente formatos como "Beefeater 1 caja", "Beefeater ---- 1 caja", "Beefeater 1 und", "Larios 1 ud", "Brugal 1 unidad" y devuelve siempre la cantidad al principio, 5) cuando aparezca UND, UD o UNIDAD significa unidad, 6) cuando aparezca CAJA o CAJAS significa caja, 7) no uses la x como formato de cantidad porque este cliente no la usa así, 8) si una línea no se entiende bien o dudas del texto, añádela también en uncertainLines para que quede marcada, 9) junta todas las fotos en un solo pedido, 10) no expliques nada fuera del JSON.`
+        text: `Lee estas fotos de un pedido manuscrito de bebidas. A veces recibirás dos versiones de la misma hoja: una foto original y otra pasada por modo escáner. Úsalas como ayuda visual, pero NO dupliques líneas si ves la misma hoja dos veces. Devuelve SOLO JSON válido con esta forma exacta: {"lines":["2 coca cola","1 larios"],"notes":["texto dudoso si hace falta"],"uncertainLines":["línea que no se entiende bien"]}. Reglas: 1) una línea por producto, 2) intenta corregir nombres evidentes de bebidas, 3) si la cantidad no está clara, asume 1 y añádelo en notes, 4) interpreta correctamente formatos como "Beefeater 1 caja", "Beefeater ---- 1 caja", "Beefeater 1 und", "Larios 1 ud", "Brugal 1 unidad" y devuelve siempre la cantidad al principio, 5) cuando aparezca UND, UD o UNIDAD significa unidad, 6) cuando aparezca CAJA o CAJAS significa caja, 7) no uses la x como formato de cantidad porque este cliente no la usa así, 8) si una línea no se entiende bien o dudas del texto, añádela también en uncertainLines para que quede marcada, 9) junta todas las fotos en un solo pedido, 10) no expliques nada fuera del JSON.`
       },
       ...files.map((file) => ({
         type: 'input_image',
@@ -42,14 +42,34 @@ app.post('/api/read-order', upload.array('images', 6), async (req, res) => {
       }))
     ];
 
-    const response = await openai.responses.create({
+    let response = await openai.responses.create({
       model: 'gpt-4.1-mini',
       input: [{ role: 'user', content }]
     });
 
-    const text = (response.output_text || '').trim();
-    const cleaned = text.replace(/^```json\s*/i, '').replace(/^```/i, '').replace(/```$/i, '').trim();
-    const parsed = safeParseOrderJson(cleaned);
+    let text = (response.output_text || '').trim();
+    let cleaned = text.replace(/^```json\s*/i, '').replace(/^```/i, '').replace(/```$/i, '').trim();
+    let parsed = safeParseOrderJson(cleaned);
+
+    const firstLines = Array.isArray(parsed.lines) ? parsed.lines.filter(Boolean) : [];
+    if (!firstLines.length) {
+      response = await openai.responses.create({
+        model: 'gpt-4.1-mini',
+        input: [{
+          role: 'user',
+          content: [
+            {
+              type: 'input_text',
+              text: 'Reintenta la lectura del pedido. Prioriza sacar líneas útiles aunque sean aproximadas. Si dudas, pon la línea en uncertainLines en vez de dejar lines vacío. Devuelve solo JSON válido.'
+            },
+            ...content,
+          ]
+        }]
+      });
+      text = (response.output_text || '').trim();
+      cleaned = text.replace(/^```json\s*/i, '').replace(/^```/i, '').replace(/```$/i, '').trim();
+      parsed = safeParseOrderJson(cleaned);
+    }
     const lines = Array.isArray(parsed.lines) ? parsed.lines.map((x) => String(x).trim()).filter(Boolean) : [];
     const notes = Array.isArray(parsed.notes) ? parsed.notes.map((x) => String(x).trim()).filter(Boolean) : [];
     const uncertainLines = Array.isArray(parsed.uncertainLines) ? parsed.uncertainLines.map((x) => String(x).trim()).filter(Boolean) : [];

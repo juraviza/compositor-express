@@ -482,14 +482,15 @@ async function runOCRFromSelectedImage() {
   els.ocrBtn.disabled = true;
   setOcrStatus(`Preparando ${files.length} foto(s) en modo escáner...`);
   try {
-    const scannedFiles = [];
+    const preparedFiles = [];
     for (const file of files) {
-      scannedFiles.push(await enhanceImageForOCR(file));
+      const variants = await enhanceImageForOCR(file);
+      preparedFiles.push(...variants);
     }
 
     setOcrStatus(`Leyendo ${files.length} foto(s) con IA...`);
     const form = new FormData();
-    scannedFiles.forEach((file) => form.append('images', file, file.name || 'scan.jpg'));
+    preparedFiles.forEach((file) => form.append('images', file, file.name || 'scan.jpg'));
     const res = await fetch('/api/read-order', { method: 'POST', body: form });
 
     let data = null;
@@ -540,33 +541,57 @@ function readFileAsDataUrl(file) {
 async function enhanceImageForOCR(file) {
   const dataUrl = await readFileAsDataUrl(file);
   const img = await loadImage(dataUrl);
-  const maxWidth = 1800;
+  const maxWidth = 2200;
   const scale = Math.min(1, maxWidth / img.width);
   const width = Math.max(1, Math.round(img.width * scale));
   const height = Math.max(1, Math.round(img.height * scale));
 
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d', { willReadFrequently: true });
-  ctx.drawImage(img, 0, 0, width, height);
+  const baseCanvas = document.createElement('canvas');
+  baseCanvas.width = width;
+  baseCanvas.height = height;
+  const baseCtx = baseCanvas.getContext('2d', { willReadFrequently: true });
+  baseCtx.drawImage(img, 0, 0, width, height);
 
-  const imageData = ctx.getImageData(0, 0, width, height);
+  const originalBlob = await new Promise((resolve) => baseCanvas.toBlob(resolve, 'image/jpeg', 0.95));
+
+  const scanCanvas = document.createElement('canvas');
+  scanCanvas.width = width;
+  scanCanvas.height = height;
+  const scanCtx = scanCanvas.getContext('2d', { willReadFrequently: true });
+  scanCtx.drawImage(baseCanvas, 0, 0);
+
+  const imageData = scanCtx.getImageData(0, 0, width, height);
   const data = imageData.data;
+  const grayValues = [];
+
   for (let i = 0; i < data.length; i += 4) {
-    const r = data[i];
-    const g = data[i + 1];
-    const b = data[i + 2];
-    let gray = 0.299 * r + 0.587 * g + 0.114 * b;
-    gray = gray > 170 ? 245 : gray < 120 ? 35 : gray;
+    const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+    grayValues.push(gray);
+  }
+
+  grayValues.sort((a, b) => a - b);
+  const low = grayValues[Math.floor(grayValues.length * 0.08)] ?? 0;
+  const high = grayValues[Math.floor(grayValues.length * 0.92)] ?? 255;
+  const range = Math.max(1, high - low);
+
+  for (let i = 0, px = 0; i < data.length; i += 4, px++) {
+    let gray = grayValues[px];
+    gray = Math.max(0, Math.min(255, ((gray - low) * 255) / range));
+    gray = gray > 185 ? 255 : gray < 95 ? 10 : gray;
     data[i] = gray;
     data[i + 1] = gray;
     data[i + 2] = gray;
   }
-  ctx.putImageData(imageData, 0, 0);
 
-  const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.92));
-  return new File([blob], file.name.replace(/\.[^.]+$/, '') + '-scan.jpg', { type: 'image/jpeg' });
+  scanCtx.putImageData(imageData, 0, 0);
+
+  const scanBlob = await new Promise((resolve) => scanCanvas.toBlob(resolve, 'image/jpeg', 0.95));
+  const baseName = file.name.replace(/\.[^.]+$/, '');
+
+  return [
+    new File([originalBlob], `${baseName}-original.jpg`, { type: 'image/jpeg' }),
+    new File([scanBlob], `${baseName}-scan.jpg`, { type: 'image/jpeg' }),
+  ];
 }
 
 function loadImage(src) {
