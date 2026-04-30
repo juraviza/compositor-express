@@ -497,11 +497,11 @@ async function runOCRFromSelectedImage() {
     try {
       data = await res.json();
     } catch {
-      throw new Error('La lectura devolvió una respuesta vacía o rota. Prueba otra vez con la foto más centrada.');
+      throw new Error('No he podido leer bien esa foto. Prueba otra vez o saca la foto un poco más recta y más cerca.');
     }
 
     if (!res.ok || !data?.ok) {
-      throw new Error(data?.message || 'No se pudo leer la foto.');
+      throw new Error(data?.message || 'No he podido leer bien esa foto. Prueba otra vez con la hoja más centrada.');
     }
     const text = Array.isArray(data.lines) ? data.lines.join('\n') : '';
     if (!text.trim()) {
@@ -518,7 +518,12 @@ async function runOCRFromSelectedImage() {
     setOcrStatus(`Fotos convertidas a texto correctamente.${notes}${uncertain}`);
     classify();
   } catch (error) {
-    setOcrStatus(error?.message || 'Hubo un problema al leer la foto con IA.');
+    const message = String(error?.message || '');
+    if (/json|vacía o rota/i.test(message)) {
+      setOcrStatus('No he podido leer bien esa foto. Prueba otra vez o saca la foto un poco más recta y más cerca.');
+    } else {
+      setOcrStatus(message || 'Hubo un problema al leer la foto con IA.');
+    }
   } finally {
     state.ocrRunning = false;
     els.ocrBtn.disabled = false;

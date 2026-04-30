@@ -91,9 +91,13 @@ function safeParseOrderJson(text) {
   } catch {
     const match = text.match(/\{[\s\S]*\}/);
     if (!match) {
-      throw new Error('La IA no devolvió un JSON válido.');
+      return { lines: [], notes: ['La IA no pudo devolver una lectura limpia.'], uncertainLines: ['Foto difícil de interpretar'] };
     }
-    return JSON.parse(match[0]);
+    try {
+      return JSON.parse(match[0]);
+    } catch {
+      return { lines: [], notes: ['La IA devolvió una lectura incompleta.'], uncertainLines: ['Foto difícil de interpretar'] };
+    }
   }
 }
 
