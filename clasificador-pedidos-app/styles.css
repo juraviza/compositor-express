@@ -55,6 +55,7 @@ textarea { resize:vertical; min-height:280px; }
 .btn-ghost { background:#f8fbf8; color:var(--muted); border:1px solid var(--line); }
 .file-drop { border:1.5px dashed var(--line); border-radius:14px; padding:14px; min-height:52px; justify-content:center; background:#fafdfb; }
 .file-drop input { padding:0; border:0; background:transparent; }
+.paste-hint { flex:1 1 260px; min-height:52px; display:flex; align-items:center; padding:14px 16px; border:1px dashed var(--line); border-radius:14px; background:#f8fbf8; color:var(--muted); font-weight:700; }
 .ocr-status { padding:12px 14px; border-radius:12px; background:#f8fbf8; border:1px solid var(--line); color:var(--muted); font-size:14px; }
 .image-preview { border:1px solid var(--line); border-radius:14px; padding:12px; background:#fff; }
 .image-preview img { width:100%; max-height:360px; object-fit:contain; display:block; border-radius:10px; }
