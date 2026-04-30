@@ -17,7 +17,7 @@ const state = {
   items: [],
   issues: [],
   lastOutput: '',
-  imageDataUrl: '',
+  imageDataUrls: [],
   ocrRunning: false,
 };
 
@@ -70,11 +70,11 @@ function resetAll() {
   els.rawInput.value = '';
   state.items = [];
   state.issues = [];
-  state.imageDataUrl = '';
+  state.imageDataUrls = [];
   els.imageInput.value = '';
   els.imagePreview.src = '';
   els.imagePreviewWrap.hidden = true;
-  setOcrStatus('Puedes subir una foto escrita a mano y la app intentará pasarla a texto.');
+  setOcrStatus('Puedes subir una o varias fotos escritas a mano y la app intentará pasarlas a texto.');
   renderAll();
 }
 
@@ -240,31 +240,29 @@ function groupByCategory(items) {
 }
 
 async function handleImageSelected(event) {
-  const [file] = event.target.files || [];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    state.imageDataUrl = String(reader.result || '');
-    els.imagePreview.src = state.imageDataUrl;
-    els.imagePreviewWrap.hidden = false;
-    setOcrStatus('Foto cargada. Pulsa "Leer foto" para convertirla a texto.');
-  };
-  reader.readAsDataURL(file);
+  const files = Array.from(event.target.files || []);
+  if (!files.length) return;
+
+  const previews = await Promise.all(files.slice(0, 4).map((file) => readFileAsDataUrl(file)));
+  state.imageDataUrls = previews;
+  els.imagePreview.src = previews[0] || '';
+  els.imagePreviewWrap.hidden = !previews[0];
+  setOcrStatus(`${files.length} foto(s) cargadas. Pulsa "Leer foto(s)" para convertirlas a texto.`);
 }
 
 async function runOCRFromSelectedImage() {
-  const [file] = els.imageInput.files || [];
-  if (!file) {
-    setOcrStatus('Primero sube una foto del pedido.');
+  const files = Array.from(els.imageInput.files || []);
+  if (!files.length) {
+    setOcrStatus('Primero sube una o varias fotos del pedido.');
     return;
   }
   if (state.ocrRunning) return;
   state.ocrRunning = true;
   els.ocrBtn.disabled = true;
-  setOcrStatus('Leyendo la foto con IA...');
+  setOcrStatus(`Leyendo ${files.length} foto(s) con IA...`);
   try {
     const form = new FormData();
-    form.append('image', file);
+    files.forEach((file) => form.append('images', file));
     const res = await fetch('/api/read-order', { method: 'POST', body: form });
     const data = await res.json();
     if (!res.ok || !data?.ok) {
@@ -272,12 +270,15 @@ async function runOCRFromSelectedImage() {
     }
     const text = Array.isArray(data.lines) ? data.lines.join('\n') : '';
     if (!text.trim()) {
-      setOcrStatus('La IA no ha podido extraer líneas útiles de la foto.');
+      setOcrStatus('La IA no ha podido extraer líneas útiles de las fotos.');
       return;
     }
     els.rawInput.value = text;
     const notes = Array.isArray(data.notes) && data.notes.length ? ` Avisos: ${data.notes.join(' | ')}` : '';
-    setOcrStatus(`Foto convertida a texto correctamente.${notes}`);
+    const uncertain = Array.isArray(data.uncertainLines) && data.uncertainLines.length
+      ? ` Líneas dudosas: ${data.uncertainLines.join(' | ')}`
+      : '';
+    setOcrStatus(`Fotos convertidas a texto correctamente.${notes}${uncertain}`);
     classify();
   } catch (error) {
     setOcrStatus(error?.message || 'Hubo un problema al leer la foto con IA.');
@@ -289,6 +290,15 @@ async function runOCRFromSelectedImage() {
 
 function setOcrStatus(message) {
   els.ocrStatus.textContent = message;
+}
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 function copyOutput() {
