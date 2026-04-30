@@ -65,6 +65,7 @@ const DEFAULT_PRODUCT_MEMORY = {
   'ribera': 'Bebidas alcohólicas',
   'lambrusco': 'Bebidas alcohólicas',
   'coca cola': 'Refrescos',
+  'cola': 'Refrescos',
   'cocacola': 'Refrescos',
   'coca cola zero': 'Refrescos',
   'coca cola zero zero': 'Refrescos',
@@ -93,6 +94,7 @@ const DEFAULT_PRODUCT_MEMORY = {
   'águila': 'Cervezas',
   'alhambra': 'Cervezas',
   'san miguel': 'Cervezas',
+  'quinto especial': 'Cervezas',
   'agua': 'Refrescos',
   'font vella': 'Refrescos',
   'lanjaron': 'Refrescos',
@@ -185,8 +187,8 @@ const KEYWORDS = [
   { category: 'Bebidas alcohólicas', terms: ['barcelo', 'barceló', 'brugal', 'cacique', 'legendario', 'santa teresa', 'havana club', 'bacardi', 'arehucas', 'ron', 'exotica', 'exótica'] },
   { category: 'Bebidas alcohólicas', terms: ['ballant', 'ballantais', 'jyb', 'j&b', 'white label', 'joni', 'johnnie', 'joni rojo', 'joni negro', 'cien piper', '100 pipers', 'passport', 'dyc', 'jameson', 'macallan', 'whisky'] },
   { category: 'Bebidas alcohólicas', terms: ['absolut', 'smirnoff', 'ciroc', 'cîroc', 'bailes', 'baileys', 'tequila', 'jager', 'jäger', 'maria brizard', 'maría brizar', 'anis del mono', 'anís del mono', 'anis dulce', 'anís dulce', 'martin miller', 'licor 43', 'vodca', 'vodka', 'licor'] },
-  { category: 'Refrescos', terms: ['coca cola', 'cocacola', 'fanta', 'sprite', 'tonica', 'tónica', 'limonada', 'neste', 'nestea', 'aquarios', 'aquarius', 'kas', 'zero'] },
-  { category: 'Cervezas', terms: ['cruzcampo', 'heineken', 'heniker', 'radler', 'aguila', 'águila', 'estrella', 'victoria', 'mahou', 'amstel', 'alhambra', 'san miguel', 'cerveza', 'barril', 'barriles', 'parril', 'parriles'] },
+  { category: 'Refrescos', terms: ['coca cola', 'cocacola', 'cola', 'fanta', 'sprite', 'tonica', 'tónica', 'limonada', 'neste', 'nestea', 'aquarios', 'aquarius', 'kas', 'zero'] },
+  { category: 'Cervezas', terms: ['cruzcampo', 'heineken', 'heniker', 'radler', 'aguila', 'águila', 'estrella', 'victoria', 'mahou', 'amstel', 'alhambra', 'san miguel', 'quinto especial', 'cerveza', 'barril', 'barriles', 'parril', 'parriles'] },
   { category: 'Refrescos', terms: ['agua', 'monster', 'moster', 'red bull', 'burn', 'font vella', 'lanjaron', 'lanjaron', 'cabreiroa', 'aquabona'] },
   { category: 'Bebidas alcohólicas', terms: ['martini', 'miura', 'vermut', 'rioja', 'ribera', 'lambrusco', 'vino'] },
   { category: 'Cocina y despensa', terms: ['tomate', 'alcachof', 'champiñ', 'champiñ', 'esparrag', 'maiz', 'maíz', 'zanahoria', 'atun', 'atún', 'aceituna', 'pepinillo', 'piquillo', 'espinaca', 'garbanzo', 'judia', 'judía', 'lenteja', 'aceite', 'vinagre', 'sal', 'azucar', 'azúcar', 'harina', 'arroz', 'pasta', 'queso', 'mozzarella', 'mayonesa', 'ketchup', 'mostaza', 'salsa', 'caldo', 'nata cocinar', 'leche evaporada', 'huevo', 'patata'] },
@@ -341,6 +343,7 @@ function normalizeOcrLine(line) {
     .replace(/\bBefeter\b/gi, 'Beefeater')
     .replace(/\bSegram\b/gi, 'Seagram')
     .replace(/\bMoster\b/gi, 'Monster')
+    .replace(/\bCola\b/gi, 'Coca Cola')
     .replace(/\bChampi\s+laminado\b/gi, 'Champiñón laminado')
     .replace(/\bund\b/gi, 'unidad')
     .replace(/\bud\b/gi, 'unidad')
