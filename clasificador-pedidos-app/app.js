@@ -1,5 +1,5 @@
 const CATEGORY_OPTIONS = [
-  'Ginebras', 'Rones', 'Whiskies', 'Vodkas y licores', 'Refrescos', 'Cervezas', 'Aguas y energéticas', 'Vinos y vermut', 'Otros'
+  'Ginebras', 'Rones', 'Whiskies', 'Vodkas y licores', 'Refrescos', 'Cervezas', 'Aguas y energéticas', 'Vinos y vermut', 'Cocina y despensa', 'Otros'
 ];
 
 const PRODUCT_MEMORY = {
@@ -94,7 +94,55 @@ const PRODUCT_MEMORY = {
   'monster': 'Aguas y energéticas',
   'red bull': 'Aguas y energéticas',
   'burn': 'Aguas y energéticas',
-  'aquabona': 'Aguas y energéticas'
+  'aquabona': 'Aguas y energéticas',
+  'tomate frito': 'Cocina y despensa',
+  'tomate triturado': 'Cocina y despensa',
+  'tomate pelado': 'Cocina y despensa',
+  'lata de tomate': 'Cocina y despensa',
+  'alcachofas': 'Cocina y despensa',
+  'lata de alcachofas': 'Cocina y despensa',
+  'champiñon': 'Cocina y despensa',
+  'champiñón': 'Cocina y despensa',
+  'esparragos': 'Cocina y despensa',
+  'espárragos': 'Cocina y despensa',
+  'maiz': 'Cocina y despensa',
+  'maíz': 'Cocina y despensa',
+  'zanahoria': 'Cocina y despensa',
+  'atun': 'Cocina y despensa',
+  'atún': 'Cocina y despensa',
+  'aceitunas': 'Cocina y despensa',
+  'pepinillos': 'Cocina y despensa',
+  'pimientos del piquillo': 'Cocina y despensa',
+  'espinacas': 'Cocina y despensa',
+  'garbanzos': 'Cocina y despensa',
+  'judias verdes': 'Cocina y despensa',
+  'judías verdes': 'Cocina y despensa',
+  'lentejas': 'Cocina y despensa',
+  'aceite': 'Cocina y despensa',
+  'aceite freir': 'Cocina y despensa',
+  'aceite freír': 'Cocina y despensa',
+  'vinagre': 'Cocina y despensa',
+  'sal': 'Cocina y despensa',
+  'azucar': 'Cocina y despensa',
+  'azúcar': 'Cocina y despensa',
+  'harina': 'Cocina y despensa',
+  'arroz': 'Cocina y despensa',
+  'pasta': 'Cocina y despensa',
+  'queso barra': 'Cocina y despensa',
+  'queso rallado': 'Cocina y despensa',
+  'mozzarella': 'Cocina y despensa',
+  'mayonesa': 'Cocina y despensa',
+  'ketchup': 'Cocina y despensa',
+  'mostaza': 'Cocina y despensa',
+  'salsa barbacoa': 'Cocina y despensa',
+  'salsa cesar': 'Cocina y despensa',
+  'salsa césar': 'Cocina y despensa',
+  'caldo': 'Cocina y despensa',
+  'nata cocinar': 'Cocina y despensa',
+  'leche evaporada': 'Cocina y despensa',
+  'huevos': 'Cocina y despensa',
+  'patatas fritas': 'Cocina y despensa',
+  'patatas': 'Cocina y despensa'
 };
 
 const KEYWORDS = [
@@ -106,6 +154,7 @@ const KEYWORDS = [
   { category: 'Cervezas', terms: ['cruzcampo', 'heineken', 'heniker', 'radler', 'aguila', 'águila', 'estrella', 'victoria', 'mahou', 'amstel', 'alhambra', 'san miguel', 'cerveza', 'barril'] },
   { category: 'Aguas y energéticas', terms: ['agua', 'monster', 'moster', 'red bull', 'burn', 'font vella', 'lanjaron', 'lanjaron', 'cabreiroa', 'aquabona'] },
   { category: 'Vinos y vermut', terms: ['martini', 'miura', 'vermut', 'rioja', 'ribera', 'lambrusco', 'vino'] },
+  { category: 'Cocina y despensa', terms: ['tomate', 'alcachof', 'champiñ', 'champiñ', 'esparrag', 'maiz', 'maíz', 'zanahoria', 'atun', 'atún', 'aceituna', 'pepinillo', 'piquillo', 'espinaca', 'garbanzo', 'judia', 'judía', 'lenteja', 'aceite', 'vinagre', 'sal', 'azucar', 'azúcar', 'harina', 'arroz', 'pasta', 'queso', 'mozzarella', 'mayonesa', 'ketchup', 'mostaza', 'salsa', 'caldo', 'nata cocinar', 'leche evaporada', 'huevo', 'patata'] },
 ];
 
 const state = {
