@@ -108,8 +108,11 @@ const DEFAULT_PRODUCT_MEMORY = {
   'lata de tomate': 'Cocina y despensa',
   'alcachofas': 'Cocina y despensa',
   'lata de alcachofas': 'Cocina y despensa',
+  'champi laminado': 'Cocina y despensa',
   'champiñon': 'Cocina y despensa',
   'champiñón': 'Cocina y despensa',
+  'champiñon laminado': 'Cocina y despensa',
+  'champiñón laminado': 'Cocina y despensa',
   'esparragos': 'Cocina y despensa',
   'espárragos': 'Cocina y despensa',
   'maiz': 'Cocina y despensa',
@@ -338,6 +341,7 @@ function normalizeOcrLine(line) {
     .replace(/\bBefeter\b/gi, 'Beefeater')
     .replace(/\bSegram\b/gi, 'Seagram')
     .replace(/\bMoster\b/gi, 'Monster')
+    .replace(/\bChampi\s+laminado\b/gi, 'Champiñón laminado')
     .replace(/\bund\b/gi, 'unidad')
     .replace(/\bud\b/gi, 'unidad')
     .replace(/\bunid(?:ad|ades)?\b/gi, 'unidad')
@@ -488,7 +492,8 @@ async function runOCRFromSelectedImage() {
       setOcrStatus('La IA no ha podido extraer líneas útiles de las fotos.');
       return;
     }
-    els.rawInput.value = text;
+    const previousText = String(els.rawInput.value || '').trim();
+    els.rawInput.value = previousText ? `${previousText}\n${text}` : text;
     state.reviewLines = Array.isArray(data.uncertainLines) ? data.uncertainLines.filter(Boolean) : [];
     const notes = Array.isArray(data.notes) && data.notes.length ? ` Avisos: ${data.notes.join(' | ')}` : '';
     const uncertain = state.reviewLines.length
