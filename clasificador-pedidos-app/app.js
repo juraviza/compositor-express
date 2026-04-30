@@ -478,12 +478,25 @@ async function runOCRFromSelectedImage() {
   if (state.ocrRunning) return;
   state.ocrRunning = true;
   els.ocrBtn.disabled = true;
-  setOcrStatus(`Leyendo ${files.length} foto(s) con IA...`);
+  setOcrStatus(`Preparando ${files.length} foto(s) en modo escáner...`);
   try {
+    const scannedFiles = [];
+    for (const file of files) {
+      scannedFiles.push(await enhanceImageForOCR(file));
+    }
+
+    setOcrStatus(`Leyendo ${files.length} foto(s) con IA...`);
     const form = new FormData();
-    files.forEach((file) => form.append('images', file));
+    scannedFiles.forEach((file) => form.append('images', file, file.name || 'scan.jpg'));
     const res = await fetch('/api/read-order', { method: 'POST', body: form });
-    const data = await res.json();
+
+    let data = null;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error('La lectura devolvió una respuesta vacía o rota. Prueba otra vez con la foto más centrada.');
+    }
+
     if (!res.ok || !data?.ok) {
       throw new Error(data?.message || 'No se pudo leer la foto.');
     }
@@ -519,6 +532,47 @@ function readFileAsDataUrl(file) {
     reader.onload = () => resolve(String(reader.result || ''));
     reader.onerror = reject;
     reader.readAsDataURL(file);
+  });
+}
+
+async function enhanceImageForOCR(file) {
+  const dataUrl = await readFileAsDataUrl(file);
+  const img = await loadImage(dataUrl);
+  const maxWidth = 1800;
+  const scale = Math.min(1, maxWidth / img.width);
+  const width = Math.max(1, Math.round(img.width * scale));
+  const height = Math.max(1, Math.round(img.height * scale));
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(img, 0, 0, width, height);
+
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    let gray = 0.299 * r + 0.587 * g + 0.114 * b;
+    gray = gray > 170 ? 245 : gray < 120 ? 35 : gray;
+    data[i] = gray;
+    data[i + 1] = gray;
+    data[i + 2] = gray;
+  }
+  ctx.putImageData(imageData, 0, 0);
+
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+  return new File([blob], file.name.replace(/\.[^.]+$/, '') + '-scan.jpg', { type: 'image/jpeg' });
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
   });
 }
 

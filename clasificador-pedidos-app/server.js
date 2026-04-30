@@ -49,7 +49,7 @@ app.post('/api/read-order', upload.array('images', 6), async (req, res) => {
 
     const text = (response.output_text || '').trim();
     const cleaned = text.replace(/^```json\s*/i, '').replace(/^```/i, '').replace(/```$/i, '').trim();
-    const parsed = JSON.parse(cleaned);
+    const parsed = safeParseOrderJson(cleaned);
     const lines = Array.isArray(parsed.lines) ? parsed.lines.map((x) => String(x).trim()).filter(Boolean) : [];
     const notes = Array.isArray(parsed.notes) ? parsed.notes.map((x) => String(x).trim()).filter(Boolean) : [];
     const uncertainLines = Array.isArray(parsed.uncertainLines) ? parsed.uncertainLines.map((x) => String(x).trim()).filter(Boolean) : [];
@@ -64,6 +64,18 @@ app.post('/api/read-order', upload.array('images', 6), async (req, res) => {
 app.get('*', (_req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
+
+function safeParseOrderJson(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    const match = text.match(/\{[\s\S]*\}/);
+    if (!match) {
+      throw new Error('La IA no devolvió un JSON válido.');
+    }
+    return JSON.parse(match[0]);
+  }
+}
 
 app.listen(port, () => {
   console.log(`CANI-APP escuchando en http://0.0.0.0:${port}`);
