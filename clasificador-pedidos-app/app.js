@@ -189,6 +189,7 @@ const PRODUCT_MEMORY = loadProductMemory();
 const state = {
   items: [],
   issues: [],
+  reviewLines: [],
   lastOutput: '',
   imageDataUrls: [],
   ocrRunning: false,
@@ -208,6 +209,8 @@ const els = {
   resetBtn: document.getElementById('resetBtn'),
   whatsBtn: document.getElementById('whatsBtn'),
   issuesList: document.getElementById('issuesList'),
+  reviewBlock: document.getElementById('reviewBlock'),
+  reviewList: document.getElementById('reviewList'),
   categoryCards: document.getElementById('categoryCards'),
   previewTableBody: document.getElementById('previewTableBody'),
   outputText: document.getElementById('outputText'),
@@ -253,6 +256,7 @@ function resetAll() {
   els.rawInput.value = '';
   state.items = [];
   state.issues = [];
+  state.reviewLines = [];
   state.imageDataUrls = [];
   els.imageInput.value = '';
   els.imagePreview.src = '';
@@ -347,6 +351,7 @@ function detectCategory(product) {
 
 function renderAll() {
   renderIssues();
+  renderReview();
   renderCards();
   renderTable();
   renderOutput();
@@ -356,6 +361,17 @@ function renderAll() {
 
 function renderIssues() {
   els.issuesList.innerHTML = state.issues.map((issue) => `<li>${escapeHtml(issue)}</li>`).join('');
+}
+
+function renderReview() {
+  if (!state.reviewLines.length) {
+    els.reviewBlock.hidden = true;
+    els.reviewList.innerHTML = '';
+    return;
+  }
+
+  els.reviewBlock.hidden = false;
+  els.reviewList.innerHTML = state.reviewLines.map((line) => `<li>${escapeHtml(line)}</li>`).join('');
 }
 
 function renderCards() {
@@ -463,9 +479,10 @@ async function runOCRFromSelectedImage() {
       return;
     }
     els.rawInput.value = text;
+    state.reviewLines = Array.isArray(data.uncertainLines) ? data.uncertainLines.filter(Boolean) : [];
     const notes = Array.isArray(data.notes) && data.notes.length ? ` Avisos: ${data.notes.join(' | ')}` : '';
-    const uncertain = Array.isArray(data.uncertainLines) && data.uncertainLines.length
-      ? ` Líneas dudosas: ${data.uncertainLines.join(' | ')}`
+    const uncertain = state.reviewLines.length
+      ? ` Líneas dudosas: ${state.reviewLines.join(' | ')}`
       : '';
     setOcrStatus(`Fotos convertidas a texto correctamente.${notes}${uncertain}`);
     classify();
