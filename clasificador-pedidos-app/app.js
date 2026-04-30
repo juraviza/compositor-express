@@ -259,6 +259,14 @@ function bindEvents() {
 function importTxtFile(event) {
   const [file] = event.target.files || [];
   if (!file) return;
+
+  const isTextFile = file.type === 'text/plain' || /\.txt$/i.test(file.name || '');
+  if (!isTextFile) {
+    els.txtFileInput.value = '';
+    setOcrStatus('Ese archivo no es un .txt. Si es una foto, súbela en "Subir foto(s) del pedido".');
+    return;
+  }
+
   const reader = new FileReader();
   reader.onload = () => {
     els.rawInput.value = reader.result;
