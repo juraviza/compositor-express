@@ -1,5 +1,5 @@
 const CATEGORY_OPTIONS = [
-  'Ginebras', 'Rones', 'Whiskies', 'Vodkas y licores', 'Refrescos', 'Cervezas', 'Aguas y energéticas', 'Vinos y vermut', 'Cocina y despensa', 'Otros'
+  'Ginebras', 'Rones', 'Whiskies', 'Vodkas y licores', 'Refrescos', 'Cervezas', 'Aguas y energéticas', 'Vinos y vermut', 'Cocina y despensa', 'Limpieza e higiene', 'Otros'
 ];
 
 const PRODUCT_MEMORY = {
@@ -142,7 +142,32 @@ const PRODUCT_MEMORY = {
   'leche evaporada': 'Cocina y despensa',
   'huevos': 'Cocina y despensa',
   'patatas fritas': 'Cocina y despensa',
-  'patatas': 'Cocina y despensa'
+  'patatas': 'Cocina y despensa',
+  'lejia': 'Limpieza e higiene',
+  'lejía': 'Limpieza e higiene',
+  'amoniaco': 'Limpieza e higiene',
+  'friegasuelos': 'Limpieza e higiene',
+  'detergente': 'Limpieza e higiene',
+  'lavavajillas': 'Limpieza e higiene',
+  'fairy': 'Limpieza e higiene',
+  'mistol': 'Limpieza e higiene',
+  'desengrasante': 'Limpieza e higiene',
+  'limpiacristales': 'Limpieza e higiene',
+  'papel higienico': 'Limpieza e higiene',
+  'papel higiénico': 'Limpieza e higiene',
+  'papel cocina': 'Limpieza e higiene',
+  'servilletas': 'Limpieza e higiene',
+  'bayetas': 'Limpieza e higiene',
+  'estropajos': 'Limpieza e higiene',
+  'guantes': 'Limpieza e higiene',
+  'gel de manos': 'Limpieza e higiene',
+  'jabon de manos': 'Limpieza e higiene',
+  'jabón de manos': 'Limpieza e higiene',
+  'gel hidroalcoholico': 'Limpieza e higiene',
+  'gel hidroalcohólico': 'Limpieza e higiene',
+  'ambientador': 'Limpieza e higiene',
+  'bobina secamanos': 'Limpieza e higiene',
+  'papel secamanos': 'Limpieza e higiene'
 };
 
 const KEYWORDS = [
@@ -155,6 +180,7 @@ const KEYWORDS = [
   { category: 'Aguas y energéticas', terms: ['agua', 'monster', 'moster', 'red bull', 'burn', 'font vella', 'lanjaron', 'lanjaron', 'cabreiroa', 'aquabona'] },
   { category: 'Vinos y vermut', terms: ['martini', 'miura', 'vermut', 'rioja', 'ribera', 'lambrusco', 'vino'] },
   { category: 'Cocina y despensa', terms: ['tomate', 'alcachof', 'champiñ', 'champiñ', 'esparrag', 'maiz', 'maíz', 'zanahoria', 'atun', 'atún', 'aceituna', 'pepinillo', 'piquillo', 'espinaca', 'garbanzo', 'judia', 'judía', 'lenteja', 'aceite', 'vinagre', 'sal', 'azucar', 'azúcar', 'harina', 'arroz', 'pasta', 'queso', 'mozzarella', 'mayonesa', 'ketchup', 'mostaza', 'salsa', 'caldo', 'nata cocinar', 'leche evaporada', 'huevo', 'patata'] },
+  { category: 'Limpieza e higiene', terms: ['lejia', 'lejía', 'amoniaco', 'friegasuelos', 'detergente', 'lavavajillas', 'fairy', 'mistol', 'desengrasante', 'limpiacristales', 'papel higienico', 'papel higiénico', 'papel cocina', 'servilleta', 'bayeta', 'estropajo', 'guante', 'gel de manos', 'jabon de manos', 'jabón de manos', 'gel hidroalcoholico', 'gel hidroalcohólico', 'ambientador', 'secamanos'] },
 ];
 
 const state = {
