@@ -192,6 +192,7 @@ const state = {
   lastOutput: '',
   imageDataUrls: [],
   ocrRunning: false,
+  editingMemoryKey: '',
 };
 
 const els = {
@@ -216,6 +217,7 @@ const els = {
   memoryProductInput: document.getElementById('memoryProductInput'),
   memoryCategoryInput: document.getElementById('memoryCategoryInput'),
   saveMemoryBtn: document.getElementById('saveMemoryBtn'),
+  cancelMemoryEditBtn: document.getElementById('cancelMemoryEditBtn'),
   memoryStatus: document.getElementById('memoryStatus'),
   memoryTableBody: document.getElementById('memoryTableBody'),
 };
@@ -233,6 +235,7 @@ function bindEvents() {
   els.imageInput.addEventListener('change', handleImageSelected);
   els.ocrBtn.addEventListener('click', runOCRFromSelectedImage);
   els.saveMemoryBtn.addEventListener('click', saveMemoryProduct);
+  els.cancelMemoryEditBtn.addEventListener('click', cancelMemoryEdit);
 }
 
 function importTxtFile(event) {
@@ -509,10 +512,16 @@ function saveMemoryProduct() {
     return;
   }
 
+  if (state.editingMemoryKey && state.editingMemoryKey !== product) {
+    delete PRODUCT_MEMORY[state.editingMemoryKey];
+  }
+
   PRODUCT_MEMORY[product] = category;
-  localStorage.setItem(PRODUCT_MEMORY_STORAGE_KEY, JSON.stringify(PRODUCT_MEMORY));
-  els.memoryProductInput.value = '';
-  els.memoryStatus.textContent = `Guardado: ${product} → ${category}`;
+  persistProductMemory();
+  els.memoryStatus.textContent = state.editingMemoryKey
+    ? `Producto actualizado: ${product} → ${category}`
+    : `Guardado: ${product} → ${category}`;
+  cancelMemoryEdit(true);
   renderMemoryTable();
   classify();
 }
@@ -523,8 +532,60 @@ function renderMemoryTable() {
     <tr>
       <td>${escapeHtml(product)}</td>
       <td>${escapeHtml(category)}</td>
+      <td>
+        <div class="memory-actions">
+          <button class="btn btn-secondary btn-sm memory-edit-btn" data-product="${escapeAttr(product)}">Editar</button>
+          <button class="btn btn-ghost btn-sm memory-delete-btn" data-product="${escapeAttr(product)}">Borrar</button>
+        </div>
+      </td>
     </tr>
   `).join('');
+
+  els.memoryTableBody.querySelectorAll('.memory-edit-btn').forEach((button) => {
+    button.addEventListener('click', () => startMemoryEdit(button.dataset.product || ''));
+  });
+
+  els.memoryTableBody.querySelectorAll('.memory-delete-btn').forEach((button) => {
+    button.addEventListener('click', () => deleteMemoryProduct(button.dataset.product || ''));
+  });
+}
+
+function startMemoryEdit(product) {
+  const category = PRODUCT_MEMORY[product];
+  if (!category) return;
+  state.editingMemoryKey = product;
+  els.memoryProductInput.value = product;
+  els.memoryCategoryInput.value = category;
+  els.saveMemoryBtn.textContent = 'Guardar cambios';
+  els.cancelMemoryEditBtn.hidden = false;
+  els.memoryStatus.textContent = `Editando: ${product}`;
+}
+
+function cancelMemoryEdit(keepStatus = false) {
+  state.editingMemoryKey = '';
+  els.memoryProductInput.value = '';
+  els.memoryCategoryInput.selectedIndex = 0;
+  els.saveMemoryBtn.textContent = 'Guardar producto en memoria';
+  els.cancelMemoryEditBtn.hidden = true;
+  if (!keepStatus) {
+    els.memoryStatus.textContent = 'Aquí verás si el producto se ha guardado bien.';
+  }
+}
+
+function deleteMemoryProduct(product) {
+  if (!PRODUCT_MEMORY[product]) return;
+  delete PRODUCT_MEMORY[product];
+  persistProductMemory();
+  if (state.editingMemoryKey === product) {
+    cancelMemoryEdit(true);
+  }
+  els.memoryStatus.textContent = `Producto borrado: ${product}`;
+  renderMemoryTable();
+  classify();
+}
+
+function persistProductMemory() {
+  localStorage.setItem(PRODUCT_MEMORY_STORAGE_KEY, JSON.stringify(PRODUCT_MEMORY));
 }
 
 function loadProductMemory() {
