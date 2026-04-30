@@ -16,6 +16,8 @@ const DEFAULT_PRODUCT_MEMORY = {
   'bombay sapphire': 'Bebidas alcohólicas',
   'martin miller': 'Bebidas alcohólicas',
   'anis dulce': 'Bebidas alcohólicas',
+  'ano dulce': 'Bebidas alcohólicas',
+  'aino dulce': 'Bebidas alcohólicas',
   'anís dulce': 'Bebidas alcohólicas',
   'barriles': 'Cervezas',
   'barril': 'Cervezas',
@@ -65,6 +67,10 @@ const DEFAULT_PRODUCT_MEMORY = {
   'ribera': 'Bebidas alcohólicas',
   'lambrusco': 'Bebidas alcohólicas',
   'coca cola': 'Refrescos',
+  'coca caja': 'Refrescos',
+  'coca pet': 'Refrescos',
+  'coca pet unidad': 'Refrescos',
+  'coca pet o unidad': 'Refrescos',
   'cola': 'Refrescos',
   'cocacola': 'Refrescos',
   'coca cola zero': 'Refrescos',
@@ -186,8 +192,8 @@ const KEYWORDS = [
   { category: 'Bebidas alcohólicas', terms: ['puerto de indias', 'larios', 'rives', 'seagram', 'segram', 'beefeater', 'befeter', 'tanqueray', 'nordes', 'nordés', 'gordons', 'bombay', 'ginebra'] },
   { category: 'Bebidas alcohólicas', terms: ['barcelo', 'barceló', 'brugal', 'cacique', 'legendario', 'santa teresa', 'havana club', 'bacardi', 'arehucas', 'ron', 'exotica', 'exótica'] },
   { category: 'Bebidas alcohólicas', terms: ['ballant', 'ballantais', 'jyb', 'j&b', 'white label', 'joni', 'johnnie', 'joni rojo', 'joni negro', 'cien piper', '100 pipers', 'passport', 'dyc', 'jameson', 'macallan', 'whisky'] },
-  { category: 'Bebidas alcohólicas', terms: ['absolut', 'smirnoff', 'ciroc', 'cîroc', 'bailes', 'baileys', 'tequila', 'jager', 'jäger', 'maria brizard', 'maría brizar', 'anis del mono', 'anís del mono', 'anis dulce', 'anís dulce', 'martin miller', 'licor 43', 'vodca', 'vodka', 'licor'] },
-  { category: 'Refrescos', terms: ['coca cola', 'cocacola', 'cola', 'fanta', 'sprite', 'tonica', 'tónica', 'limonada', 'neste', 'nestea', 'aquarios', 'aquarius', 'kas', 'zero'] },
+  { category: 'Bebidas alcohólicas', terms: ['absolut', 'smirnoff', 'ciroc', 'cîroc', 'bailes', 'baileys', 'tequila', 'jager', 'jäger', 'maria brizard', 'maría brizar', 'anis del mono', 'anís del mono', 'anis dulce', 'anís dulce', 'ano dulce', 'aino dulce', 'martin miller', 'licor 43', 'vodca', 'vodka', 'licor'] },
+  { category: 'Refrescos', terms: ['coca cola', 'cocacola', 'cola', 'coca caja', 'coca pet', 'fanta', 'sprite', 'tonica', 'tónica', 'limonada', 'neste', 'nestea', 'aquarios', 'aquarius', 'kas', 'zero'] },
   { category: 'Cervezas', terms: ['cruzcampo', 'heineken', 'heniker', 'radler', 'aguila', 'águila', 'estrella', 'victoria', 'mahou', 'amstel', 'alhambra', 'san miguel', 'quinto especial', 'cerveza', 'barril', 'barriles', 'parril', 'parriles'] },
   { category: 'Refrescos', terms: ['agua', 'monster', 'moster', 'red bull', 'burn', 'font vella', 'lanjaron', 'lanjaron', 'cabreiroa', 'aquabona'] },
   { category: 'Bebidas alcohólicas', terms: ['martini', 'miura', 'vermut', 'rioja', 'ribera', 'lambrusco', 'vino'] },
@@ -331,6 +337,12 @@ function normalizeOcrLine(line) {
     .replace(/\bSegram\b/gi, 'Seagram')
     .replace(/\bMoster\b/gi, 'Monster')
     .replace(/\bCola\b/gi, 'Coca Cola')
+    .replace(/\bAno\s+Dulce\b/gi, 'Anis Dulce')
+    .replace(/\bAino\s+Dulce\b/gi, 'Anis Dulce')
+    .replace(/\bCoca\s+caja\b/gi, 'Coca Cola')
+    .replace(/\bCoca\s+Pet\s+O\s+unidad\b/gi, 'Coca Cola')
+    .replace(/\bCoca\s+Pet\s+unidad\b/gi, 'Coca Cola')
+    .replace(/\bCoca\s+Pet\b/gi, 'Coca Cola')
     .replace(/\bChampi\s+laminado\b/gi, 'Champiñón laminado')
     .replace(/\bund\b/gi, 'unidad')
     .replace(/\bud\b/gi, 'unidad')
