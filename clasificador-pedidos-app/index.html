@@ -99,36 +99,38 @@
 
       <section class="panel stack gap-lg full-width">
         <div class="section-title-row">
-          <h2>Memoria de productos</h2>
-          <span class="badge">Muy fácil</span>
+          <h2>Memoria</h2>
+          <button id="toggleMemoryBtn" class="btn btn-secondary btn-sm">Abrir memoria</button>
         </div>
-        <p class="helper-text">Si aparece un producto nuevo, escríbelo aquí una sola vez y la app lo recordará para la próxima.</p>
-        <div class="memory-form-grid">
-          <label>
-            Nombre del producto
-            <input id="memoryProductInput" type="text" placeholder="Ejemplo: Seven Up" />
-          </label>
-          <label>
-            Categoría
-            <select id="memoryCategoryInput"></select>
-          </label>
-        </div>
-        <div class="actions-wrap">
-          <button id="saveMemoryBtn" class="btn btn-primary">Guardar producto en memoria</button>
-          <button id="cancelMemoryEditBtn" class="btn btn-ghost" hidden>Cancelar edición</button>
-        </div>
-        <div id="memoryStatus" class="ocr-status">Aquí verás si el producto se ha guardado bien.</div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Producto guardado</th>
-                <th>Categoría</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="memoryTableBody"></tbody>
-          </table>
+        <div id="memoryPanel" hidden>
+          <p class="helper-text">Si aparece un producto nuevo, escríbelo aquí una sola vez y la app lo recordará para la próxima.</p>
+          <div class="memory-form-grid">
+            <label>
+              Nombre del producto
+              <input id="memoryProductInput" type="text" placeholder="Ejemplo: Seven Up" />
+            </label>
+            <label>
+              Categoría
+              <select id="memoryCategoryInput"></select>
+            </label>
+          </div>
+          <div class="actions-wrap">
+            <button id="saveMemoryBtn" class="btn btn-primary">Guardar producto en memoria</button>
+            <button id="cancelMemoryEditBtn" class="btn btn-ghost" hidden>Cancelar edición</button>
+          </div>
+          <div id="memoryStatus" class="ocr-status">Aquí verás si el producto se ha guardado bien.</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto guardado</th>
+                  <th>Categoría</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="memoryTableBody"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 

@@ -219,6 +219,8 @@ const els = {
   productsBadge: document.getElementById('productsBadge'),
   memoryProductInput: document.getElementById('memoryProductInput'),
   memoryCategoryInput: document.getElementById('memoryCategoryInput'),
+  toggleMemoryBtn: document.getElementById('toggleMemoryBtn'),
+  memoryPanel: document.getElementById('memoryPanel'),
   saveMemoryBtn: document.getElementById('saveMemoryBtn'),
   cancelMemoryEditBtn: document.getElementById('cancelMemoryEditBtn'),
   memoryStatus: document.getElementById('memoryStatus'),
@@ -239,6 +241,7 @@ function bindEvents() {
   els.ocrBtn.addEventListener('click', runOCRFromSelectedImage);
   els.saveMemoryBtn.addEventListener('click', saveMemoryProduct);
   els.cancelMemoryEditBtn.addEventListener('click', cancelMemoryEdit);
+  els.toggleMemoryBtn.addEventListener('click', toggleMemoryPanel);
 }
 
 function importTxtFile(event) {
@@ -517,6 +520,8 @@ function setupMemoryEditor() {
     .filter((option) => option !== 'Otros')
     .map((option) => `<option value="${escapeAttr(option)}">${escapeHtml(option)}</option>`)
     .join('');
+  els.memoryPanel.hidden = true;
+  els.toggleMemoryBtn.textContent = 'Abrir memoria';
   renderMemoryTable();
 }
 
@@ -571,6 +576,8 @@ function startMemoryEdit(product) {
   const category = PRODUCT_MEMORY[product];
   if (!category) return;
   state.editingMemoryKey = product;
+  els.memoryPanel.hidden = false;
+  els.toggleMemoryBtn.textContent = 'Ocultar memoria';
   els.memoryProductInput.value = product;
   els.memoryCategoryInput.value = category;
   els.saveMemoryBtn.textContent = 'Guardar cambios';
@@ -603,6 +610,12 @@ function deleteMemoryProduct(product) {
 
 function persistProductMemory() {
   localStorage.setItem(PRODUCT_MEMORY_STORAGE_KEY, JSON.stringify(PRODUCT_MEMORY));
+}
+
+function toggleMemoryPanel() {
+  const willOpen = els.memoryPanel.hidden;
+  els.memoryPanel.hidden = !willOpen;
+  els.toggleMemoryBtn.textContent = willOpen ? 'Ocultar memoria' : 'Abrir memoria';
 }
 
 function loadProductMemory() {
