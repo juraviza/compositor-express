@@ -505,7 +505,16 @@ async function runOCRFromSelectedImage() {
     }
     const text = Array.isArray(data.lines) ? data.lines.join('\n') : '';
     if (!text.trim()) {
-      setOcrStatus('La IA no ha podido extraer líneas útiles de las fotos.');
+      const rough = Array.isArray(data.uncertainLines) ? data.uncertainLines.join('\n') : '';
+      if (rough.trim()) {
+        const previousText = String(els.rawInput.value || '').trim();
+        els.rawInput.value = previousText ? `${previousText}\n${rough}` : rough;
+        state.reviewLines = Array.isArray(data.uncertainLines) ? data.uncertainLines.filter(Boolean) : [];
+        setOcrStatus('He sacado una lectura aproximada. Revísala en el bloque REVISAR antes de darla por buena.');
+        classify();
+        return;
+      }
+      setOcrStatus('No he podido sacar texto útil de esa foto todavía.');
       return;
     }
     const previousText = String(els.rawInput.value || '').trim();
