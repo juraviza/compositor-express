@@ -247,50 +247,38 @@ async function handleImageSelected(event) {
 }
 
 async function runOCRFromSelectedImage() {
-  if (!state.imageDataUrl) {
+  const [file] = els.imageInput.files || [];
+  if (!file) {
     setOcrStatus('Primero sube una foto del pedido.');
-    return;
-  }
-  if (!window.Tesseract) {
-    setOcrStatus('No se ha cargado el lector OCR.');
     return;
   }
   if (state.ocrRunning) return;
   state.ocrRunning = true;
   els.ocrBtn.disabled = true;
-  setOcrStatus('Leyendo la foto... puede tardar unos segundos.');
+  setOcrStatus('Leyendo la foto con IA...');
   try {
-    const result = await window.Tesseract.recognize(state.imageDataUrl, 'spa', {
-      logger: (msg) => {
-        if (msg.status === 'recognizing text' && typeof msg.progress === 'number') {
-          setOcrStatus(`Leyendo la foto... ${Math.round(msg.progress * 100)}%`);
-        }
-      }
-    });
-    const text = cleanOcrText(result?.data?.text || '');
+    const form = new FormData();
+    form.append('image', file);
+    const res = await fetch('/api/read-order', { method: 'POST', body: form });
+    const data = await res.json();
+    if (!res.ok || !data?.ok) {
+      throw new Error(data?.message || 'No se pudo leer la foto.');
+    }
+    const text = Array.isArray(data.lines) ? data.lines.join('\n') : '';
     if (!text.trim()) {
-      setOcrStatus('No he podido sacar texto útil de la foto. Prueba con una imagen más clara.');
+      setOcrStatus('La IA no ha podido extraer líneas útiles de la foto.');
       return;
     }
     els.rawInput.value = text;
-    setOcrStatus('Foto convertida a texto. Revisa el resultado y pulsa clasificar si hace falta.');
+    const notes = Array.isArray(data.notes) && data.notes.length ? ` Avisos: ${data.notes.join(' | ')}` : '';
+    setOcrStatus(`Foto convertida a texto correctamente.${notes}`);
     classify();
   } catch (error) {
-    setOcrStatus('Hubo un problema al leer la foto. Prueba con otra más nítida.');
+    setOcrStatus(error?.message || 'Hubo un problema al leer la foto con IA.');
   } finally {
     state.ocrRunning = false;
     els.ocrBtn.disabled = false;
   }
-}
-
-function cleanOcrText(text) {
-  return String(text || '')
-    .replace(/\r/g, '\n')
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => line.replace(/[{}]/g, '').replace(/\s{2,}/g, ' '))
-    .join('\n');
 }
 
 function setOcrStatus(message) {
