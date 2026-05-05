@@ -20,8 +20,14 @@ async function bootstrap() {
     next();
   });
 
+  const healthPayload = { ok: true, vision: !!process.env.OPENAI_API_KEY, service: 'cani-ocr' };
+
   app.use('/api/vision-health', (_req: Request, res: Response) => {
-    res.json({ ok: true, vision: !!process.env.OPENAI_API_KEY });
+    res.json(healthPayload);
+  });
+
+  app.use('/api/health', (_req: Request, res: Response) => {
+    res.json(healthPayload);
   });
 
   app.use('/api/read-order', upload.array('images', 6), async (req: Request, res: Response) => {
