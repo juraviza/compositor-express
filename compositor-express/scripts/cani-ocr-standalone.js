@@ -1,8 +1,30 @@
 const express = require('express');
 const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 12 * 1024 * 1024 } });
+const webRoot = path.resolve(__dirname, '../../cani-web-phase1');
+const caniUser = process.env.CANI_USER || 'canijo';
+const caniPass = process.env.CANI_PASS || 'cani1234';
+
+function caniAuth(req, res, next) {
+  const auth = req.headers.authorization || '';
+  if (!auth.startsWith('Basic ')) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="CANI-APP privada"');
+    return res.status(401).send('Acceso restringido');
+  }
+  const raw = Buffer.from(auth.slice(6), 'base64').toString('utf8');
+  const idx = raw.indexOf(':');
+  const user = idx >= 0 ? raw.slice(0, idx) : '';
+  const pass = idx >= 0 ? raw.slice(idx + 1) : '';
+  if (user !== caniUser || pass !== caniPass) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="CANI-APP privada"');
+    return res.status(401).send('Acceso restringido');
+  }
+  next();
+}
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -15,6 +37,16 @@ app.use((req, res, next) => {
 app.get('/api/vision-health', (_req, res) => {
   res.json({ ok: true, vision: !!process.env.OPENAI_API_KEY, standalone: true });
 });
+
+app.get('/api/health', (_req, res) => {
+  res.json({ ok: true, vision: !!process.env.OPENAI_API_KEY, standalone: true, service: 'cani-ocr' });
+});
+
+app.get(['/cani', '/cani/'], caniAuth, (_req, res) => {
+  res.type('html').send(fs.readFileSync(path.join(webRoot, 'index.html'), 'utf8'));
+});
+
+app.use('/cani', caniAuth, express.static(webRoot, { index: false }));
 
 app.post('/api/read-order', upload.array('images', 6), async (req, res) => {
   try {
