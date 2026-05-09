@@ -580,11 +580,16 @@ async function enhanceImageForOCR(file) {
   const bwDocBlob = await createProcessedOcrBlob(baseCanvas, { lowQ: 0.03, highQ: 0.97, whiteCut: 222, blackCut: 92, gamma: 0.78, binaryThreshold: 168 });
   const baseName = file.name.replace(/\.[^.]+$/, '');
 
+  const upperCropBlob = await createCroppedOcrBlob(baseCanvas, { topRatio: 0.0, heightRatio: 0.62 });
+  const lowerCropBlob = await createCroppedOcrBlob(baseCanvas, { topRatio: 0.38, heightRatio: 0.62 });
+
   return [
     new File([originalBlob], `${baseName}-original.jpg`, { type: 'image/jpeg' }),
     new File([graySoftBlob], `${baseName}-scan-soft.jpg`, { type: 'image/jpeg' }),
     new File([grayHardBlob], `${baseName}-scan-hard.jpg`, { type: 'image/jpeg' }),
     new File([bwDocBlob], `${baseName}-scan-bw.jpg`, { type: 'image/jpeg' }),
+    new File([upperCropBlob], `${baseName}-crop-top.jpg`, { type: 'image/jpeg' }),
+    new File([lowerCropBlob], `${baseName}-crop-bottom.jpg`, { type: 'image/jpeg' }),
   ];
 }
 
@@ -627,6 +632,20 @@ async function createProcessedOcrBlob(sourceCanvas, options) {
 
   scanCtx.putImageData(imageData, 0, 0);
   return new Promise((resolve) => scanCanvas.toBlob(resolve, 'image/jpeg', 0.98));
+}
+
+async function createCroppedOcrBlob(sourceCanvas, options) {
+  const { topRatio, heightRatio } = options;
+  const srcW = sourceCanvas.width;
+  const srcH = sourceCanvas.height;
+  const y = Math.max(0, Math.floor(srcH * topRatio));
+  const h = Math.max(1, Math.min(srcH - y, Math.floor(srcH * heightRatio)));
+  const cropCanvas = document.createElement('canvas');
+  cropCanvas.width = srcW;
+  cropCanvas.height = h;
+  const cropCtx = cropCanvas.getContext('2d', { willReadFrequently: true });
+  cropCtx.drawImage(sourceCanvas, 0, y, srcW, h, 0, 0, srcW, h);
+  return new Promise((resolve) => cropCanvas.toBlob(resolve, 'image/jpeg', 0.98));
 }
 
 function loadImage(src) {
