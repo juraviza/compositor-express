@@ -7,6 +7,7 @@ const app = express();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 12 * 1024 * 1024 } });
 const caniUser = process.env.CANI_USER || 'canijo';
 const caniPass = process.env.CANI_PASS || 'cani1234';
+const caniPublic = String(process.env.CANI_PUBLIC || 'true').toLowerCase() === 'true';
 
 const webRootCandidates = [
   path.resolve(__dirname, '../cani-web'),
@@ -22,6 +23,7 @@ if (!webRoot) {
 }
 
 function caniAuth(req, res, next) {
+  if (caniPublic) return next();
   const auth = req.headers.authorization || '';
   if (!auth.startsWith('Basic ')) {
     res.setHeader('WWW-Authenticate', 'Basic realm="CANI-APP privada"');
