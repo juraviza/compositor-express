@@ -19,6 +19,14 @@ const webRootCandidates = [
   path.resolve(process.cwd(), 'compositor-express/cani-web'),
 ];
 const webRoot = webRootCandidates.find((candidate) => fs.existsSync(path.join(candidate, 'index.html')));
+const tessdataRootCandidates = [
+  path.resolve(__dirname, '..'),
+  path.resolve(process.cwd()),
+  path.resolve(process.cwd(), 'compositor-express'),
+];
+const tessdataRoot = tessdataRootCandidates.find((candidate) => (
+  fs.existsSync(path.join(candidate, 'spa.traineddata')) && fs.existsSync(path.join(candidate, 'eng.traineddata'))
+));
 
 if (!webRoot) {
   console.error('CANI web root not found. Checked:', webRootCandidates);
@@ -192,9 +200,16 @@ async function preprocessForDedicatedOcr(buffer) {
 }
 
 async function runDedicatedOcr(buffer) {
-  const result = await Tesseract.recognize(buffer, 'spa+eng', {
+  const options = {
     logger: () => {},
-  });
+  };
+
+  if (tessdataRoot) {
+    options.langPath = `file://${tessdataRoot}`;
+    options.gzip = false;
+  }
+
+  const result = await Tesseract.recognize(buffer, 'spa+eng', options);
   return String(result?.data?.text || '').trim();
 }
 
