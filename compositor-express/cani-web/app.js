@@ -558,7 +558,7 @@ function readFileAsDataUrl(file) {
 async function enhanceImageForOCR(file) {
   const dataUrl = await readFileAsDataUrl(file);
   const img = await loadImage(dataUrl);
-  const maxWidth = 2200;
+  const maxWidth = 2400;
   const scale = Math.min(1, maxWidth / img.width);
   const width = Math.max(1, Math.round(img.width * scale));
   const height = Math.max(1, Math.round(img.height * scale));
@@ -569,13 +569,27 @@ async function enhanceImageForOCR(file) {
   const baseCtx = baseCanvas.getContext('2d', { willReadFrequently: true });
   baseCtx.drawImage(img, 0, 0, width, height);
 
-  const originalBlob = await new Promise((resolve) => baseCanvas.toBlob(resolve, 'image/jpeg', 0.95));
+  const originalBlob = await new Promise((resolve) => baseCanvas.toBlob(resolve, 'image/jpeg', 0.98));
+  const graySoftBlob = await createProcessedOcrBlob(baseCanvas, { lowQ: 0.06, highQ: 0.94, whiteCut: 198, blackCut: 82, gamma: 0.9 });
+  const grayHardBlob = await createProcessedOcrBlob(baseCanvas, { lowQ: 0.04, highQ: 0.96, whiteCut: 212, blackCut: 72, gamma: 0.82 });
+  const baseName = file.name.replace(/\.[^.]+$/, '');
 
+  return [
+    new File([originalBlob], `${baseName}-original.jpg`, { type: 'image/jpeg' }),
+    new File([graySoftBlob], `${baseName}-scan-soft.jpg`, { type: 'image/jpeg' }),
+    new File([grayHardBlob], `${baseName}-scan-hard.jpg`, { type: 'image/jpeg' }),
+  ];
+}
+
+async function createProcessedOcrBlob(sourceCanvas, options) {
+  const { lowQ, highQ, whiteCut, blackCut, gamma } = options;
+  const width = sourceCanvas.width;
+  const height = sourceCanvas.height;
   const scanCanvas = document.createElement('canvas');
   scanCanvas.width = width;
   scanCanvas.height = height;
   const scanCtx = scanCanvas.getContext('2d', { willReadFrequently: true });
-  scanCtx.drawImage(baseCanvas, 0, 0);
+  scanCtx.drawImage(sourceCanvas, 0, 0);
 
   const imageData = scanCtx.getImageData(0, 0, width, height);
   const data = imageData.data;
@@ -586,29 +600,23 @@ async function enhanceImageForOCR(file) {
     grayValues.push(gray);
   }
 
-  grayValues.sort((a, b) => a - b);
-  const low = grayValues[Math.floor(grayValues.length * 0.08)] ?? 0;
-  const high = grayValues[Math.floor(grayValues.length * 0.92)] ?? 255;
+  const sorted = [...grayValues].sort((a, b) => a - b);
+  const low = sorted[Math.floor(sorted.length * lowQ)] ?? 0;
+  const high = sorted[Math.floor(sorted.length * highQ)] ?? 255;
   const range = Math.max(1, high - low);
 
   for (let i = 0, px = 0; i < data.length; i += 4, px++) {
     let gray = grayValues[px];
     gray = Math.max(0, Math.min(255, ((gray - low) * 255) / range));
-    gray = gray > 185 ? 255 : gray < 95 ? 10 : gray;
+    gray = 255 * Math.pow(gray / 255, gamma);
+    gray = gray > whiteCut ? 255 : gray < blackCut ? 0 : gray;
     data[i] = gray;
     data[i + 1] = gray;
     data[i + 2] = gray;
   }
 
   scanCtx.putImageData(imageData, 0, 0);
-
-  const scanBlob = await new Promise((resolve) => scanCanvas.toBlob(resolve, 'image/jpeg', 0.95));
-  const baseName = file.name.replace(/\.[^.]+$/, '');
-
-  return [
-    new File([originalBlob], `${baseName}-original.jpg`, { type: 'image/jpeg' }),
-    new File([scanBlob], `${baseName}-scan.jpg`, { type: 'image/jpeg' }),
-  ];
+  return new Promise((resolve) => scanCanvas.toBlob(resolve, 'image/jpeg', 0.98));
 }
 
 function loadImage(src) {
