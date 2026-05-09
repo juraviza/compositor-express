@@ -2,6 +2,8 @@ const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+const sharp = require('sharp');
+const Tesseract = require('tesseract.js');
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 12 * 1024 * 1024 } });
@@ -81,10 +83,14 @@ app.post('/api/read-order', upload.array('images', 12), async (req, res) => {
       return res.status(400).json({ ok: false, message: 'No se ha recibido ninguna imagen.' });
     }
 
+    const ocrHints = await extractOrderOcrHints(files);
     const content = [
       {
         type: 'input_text',
-        text: 'Lee estas fotos de un pedido manuscrito de bebidas. A veces recibirás varias versiones de la misma hoja, por ejemplo original, escaneada suave, escaneada agresiva y recortes de la mitad superior o inferior. Úsalas como apoyo visual, pero NO dupliques líneas si ves la misma hoja varias veces. MUY IMPORTANTE: estas hojas suelen tener productos escritos en la columna izquierda y cantidades o formatos en la columna derecha, emparejados por filas. Debes relacionar cada producto con la cantidad de su misma altura aunque haya flechas, tachones o la hoja esté inclinada. Si la tinta es roja o tenue, intenta igualmente rescatar cada fila útil. Devuelve SOLO JSON válido con esta forma exacta: {"lines":["2 coca cola","1 larios"],"notes":["texto dudoso si hace falta"],"uncertainLines":["línea que no se entiende bien"]}. Reglas: 1) una línea por producto, 2) intenta corregir nombres evidentes de bebidas, 3) si la cantidad no está clara, asume 1 y añádelo en notes, 4) interpreta correctamente formatos como "Beefeater 1 caja", "Beefeater ---- 1 caja", "Beefeater 1 und", "Larios 1 ud", "Brugal 1 unidad" y devuelve siempre la cantidad al principio, 5) cuando aparezca UND, UD o UNIDAD significa unidad, 6) cuando aparezca CAJA o CAJAS significa caja, 7) no uses la x como formato de cantidad porque este cliente no la usa así, 8) si una línea no se entiende bien o dudas del texto, añádela también en uncertainLines para que quede marcada, 9) junta todas las fotos en un solo pedido, 10) si puedes leer al menos parte de la hoja, devuelve esas líneas útiles aunque no estén todas perfectas, 11) piensa fila por fila, no párrafo por párrafo, 12) prioriza productos y cantidades sobre explicaciones, 13) usa los recortes para fijarte solo en unas pocas filas cuando el documento completo confunda, 14) ejemplo válido de salida: ["1 beefeater caja","2 larios unidad","10 coca cola caja","4 barriles"], 15) no expliques nada fuera del JSON.'
+        text: `Lee estas fotos de un pedido manuscrito de bebidas. A veces recibirás varias versiones de la misma hoja, por ejemplo original, escaneada suave, escaneada agresiva y recortes de la mitad superior o inferior. Úsalas como apoyo visual, pero NO dupliques líneas si ves la misma hoja varias veces. MUY IMPORTANTE: estas hojas suelen tener productos escritos en la columna izquierda y cantidades o formatos en la columna derecha, emparejados por filas. Debes relacionar cada producto con la cantidad de su misma altura aunque haya flechas, tachones o la hoja esté inclinada. Si la tinta es roja o tenue, intenta igualmente rescatar cada fila útil. Devuelve SOLO JSON válido con esta forma exacta: {"lines":["2 coca cola","1 larios"],"notes":["texto dudoso si hace falta"],"uncertainLines":["línea que no se entiende bien"]}. Reglas: 1) una línea por producto, 2) intenta corregir nombres evidentes de bebidas, 3) si la cantidad no está clara, asume 1 y añádelo en notes, 4) interpreta correctamente formatos como "Beefeater 1 caja", "Beefeater ---- 1 caja", "Beefeater 1 und", "Larios 1 ud", "Brugal 1 unidad" y devuelve siempre la cantidad al principio, 5) cuando aparezca UND, UD o UNIDAD significa unidad, 6) cuando aparezca CAJA o CAJAS significa caja, 7) no uses la x como formato de cantidad porque este cliente no la usa así, 8) si una línea no se entiende bien o dudas del texto, añádela también en uncertainLines para que quede marcada, 9) junta todas las fotos en un solo pedido, 10) si puedes leer al menos parte de la hoja, devuelve esas líneas útiles aunque no estén todas perfectas, 11) piensa fila por fila, no párrafo por párrafo, 12) prioriza productos y cantidades sobre explicaciones, 13) usa los recortes para fijarte solo en unas pocas filas cuando el documento completo confunda, 14) ejemplo válido de salida: ["1 beefeater caja","2 larios unidad","10 coca cola caja","4 barriles"], 15) si abajo incluyo pistas extraídas por OCR especializado, úsalas como apoyo pero corrige sus errores mirando la foto, 16) no expliques nada fuera del JSON.
+
+PISTAS OCR PREVIAS:
+${ocrHints || '(sin pistas OCR previas útiles)'}`
       },
       ...files.map((file) => ({
         type: 'input_image',
@@ -119,6 +125,18 @@ app.post('/api/read-order', upload.array('images', 12), async (req, res) => {
       }
     }
 
+    if ((!Array.isArray(parsed.lines) || !parsed.lines.length) && ocrHints) {
+      const recoveredLines = extractUsefulLinesFromRawText(ocrHints);
+      if (recoveredLines.length) {
+        parsed = {
+          lines: recoveredLines,
+          notes: ['Lectura recuperada desde OCR dedicado previo. Revísala.'],
+          uncertainLines: recoveredLines,
+          raw: ocrHints,
+        };
+      }
+    }
+
     const lines = Array.isArray(parsed.lines) ? parsed.lines.map((x) => String(x).trim()).filter(Boolean) : [];
     const notes = Array.isArray(parsed.notes) ? parsed.notes.map((x) => String(x).trim()).filter(Boolean) : [];
     const uncertainLines = Array.isArray(parsed.uncertainLines) ? parsed.uncertainLines.map((x) => String(x).trim()).filter(Boolean) : [];
@@ -128,6 +146,49 @@ app.post('/api/read-order', upload.array('images', 12), async (req, res) => {
     return res.status(500).json({ ok: false, message: 'No se pudo leer la foto con IA.', error: String(error?.message || error) });
   }
 });
+
+async function extractOrderOcrHints(files) {
+  const chunks = [];
+  for (const file of files.slice(0, 6)) {
+    try {
+      const processed = await preprocessForDedicatedOcr(file.buffer);
+      const text = await runDedicatedOcr(processed);
+      const cleaned = normalizeOcrText(text);
+      if (cleaned) chunks.push(cleaned);
+    } catch (error) {
+      console.error('Dedicated OCR failed for one image:', error?.message || error);
+    }
+  }
+  return chunks.join('\n\n--- OCR IMAGE ---\n\n').trim();
+}
+
+async function preprocessForDedicatedOcr(buffer) {
+  return sharp(buffer)
+    .rotate()
+    .grayscale()
+    .normalize()
+    .linear(1.4, -12)
+    .sharpen()
+    .png()
+    .toBuffer();
+}
+
+async function runDedicatedOcr(buffer) {
+  const result = await Tesseract.recognize(buffer, 'spa+eng', {
+    logger: () => {},
+  });
+  return String(result?.data?.text || '').trim();
+}
+
+function normalizeOcrText(text) {
+  return String(text || '')
+    .replace(/[|]/g, '1')
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/\r/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
 
 async function readOrderWithOpenAI(apiKey, content) {
   const text = await callOpenAIText(apiKey, content);
