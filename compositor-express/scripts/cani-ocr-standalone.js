@@ -93,7 +93,7 @@ app.post('/api/read-order', upload.array('images', 6), async (req, res) => {
     ];
 
     let parsed = await readOrderWithOpenAI(process.env.OPENAI_API_KEY, content);
-    const firstLines = Array.isArray(parsed.lines) ? parsed.lines.filter(Boolean) : [];
+    let firstLines = Array.isArray(parsed.lines) ? parsed.lines.filter(Boolean) : [];
 
     if (!firstLines.length) {
       parsed = await readOrderWithOpenAI(process.env.OPENAI_API_KEY, [
@@ -103,6 +103,20 @@ app.post('/api/read-order', upload.array('images', 6), async (req, res) => {
         },
         ...content,
       ]);
+      firstLines = Array.isArray(parsed.lines) ? parsed.lines.filter(Boolean) : [];
+    }
+
+    if (!firstLines.length) {
+      const transcription = await transcribeOrderText(process.env.OPENAI_API_KEY, content);
+      const recoveredLines = extractUsefulLinesFromRawText(transcription);
+      if (recoveredLines.length) {
+        parsed = {
+          lines: recoveredLines,
+          notes: ['Lectura recuperada desde transcripción libre de la hoja. Revísala.'],
+          uncertainLines: recoveredLines,
+          raw: transcription,
+        };
+      }
     }
 
     const lines = Array.isArray(parsed.lines) ? parsed.lines.map((x) => String(x).trim()).filter(Boolean) : [];
@@ -116,6 +130,23 @@ app.post('/api/read-order', upload.array('images', 6), async (req, res) => {
 });
 
 async function readOrderWithOpenAI(apiKey, content) {
+  const text = await callOpenAIText(apiKey, content);
+  const cleaned = text.replace(/^```json\s*/i, '').replace(/^```/i, '').replace(/```$/i, '').trim();
+  const parsed = safeParseOrderJson(cleaned);
+  return { ...parsed, raw: cleaned };
+}
+
+async function transcribeOrderText(apiKey, content) {
+  return callOpenAIText(apiKey, [
+    {
+      type: 'input_text',
+      text: 'Transcribe esta hoja manuscrita como texto plano, línea por línea. No devuelvas JSON. No expliques nada. Solo escribe las líneas de productos con sus cantidades tal como las entiendas, una por línea. Si dudas en una línea, escríbela igual de la forma más probable.',
+    },
+    ...content,
+  ]);
+}
+
+async function callOpenAIText(apiKey, content) {
   const response = await fetch('https://api.openai.com/v1/responses', {
     method: 'POST',
     headers: {
@@ -130,11 +161,7 @@ async function readOrderWithOpenAI(apiKey, content) {
 
   const json = await response.json();
   if (!response.ok) throw new Error(json?.error?.message || 'OpenAI error');
-
-  const text = String(json?.output_text || '').trim();
-  const cleaned = text.replace(/^```json\s*/i, '').replace(/^```/i, '').replace(/```$/i, '').trim();
-  const parsed = safeParseOrderJson(cleaned);
-  return { ...parsed, raw: cleaned };
+  return String(json?.output_text || '').trim();
 }
 
 function safeParseOrderJson(text) {
