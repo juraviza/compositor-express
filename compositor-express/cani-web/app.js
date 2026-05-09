@@ -506,9 +506,11 @@ async function runOCRFromSelectedImage() {
     const text = Array.isArray(data.lines) ? data.lines.join('\n') : '';
     if (!text.trim()) {
       const rough = Array.isArray(data.uncertainLines) ? data.uncertainLines.join('\n') : '';
-      if (rough.trim()) {
+      const rawFallback = typeof data.raw === 'string' ? data.raw.trim() : '';
+      const recovered = rough.trim() || rawFallback;
+      if (recovered) {
         const previousText = String(els.rawInput.value || '').trim();
-        els.rawInput.value = previousText ? `${previousText}\n${rough}` : rough;
+        els.rawInput.value = previousText ? `${previousText}\n${recovered}` : recovered;
         state.reviewLines = Array.isArray(data.uncertainLines) ? data.uncertainLines.filter(Boolean) : [];
         setOcrStatus('He sacado una lectura aproximada. Revísala en el bloque REVISAR antes de darla por buena.');
         classify();

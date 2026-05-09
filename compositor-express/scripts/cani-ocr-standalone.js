@@ -137,16 +137,49 @@ async function readOrderWithOpenAI(apiKey, content) {
 
 function safeParseOrderJson(text) {
   try {
-    return JSON.parse(text);
+    return normalizeParsedOrderJson(JSON.parse(text));
   } catch {
     const match = text.match(/\{[\s\S]*\}/);
-    if (!match) return { lines: [], notes: ['La IA no pudo devolver una lectura limpia.'], uncertainLines: ['Foto difícil de interpretar'] };
-    try {
-      return JSON.parse(match[0]);
-    } catch {
-      return { lines: [], notes: ['La IA devolvió una lectura incompleta.'], uncertainLines: ['Foto difícil de interpretar'] };
+    if (match) {
+      try {
+        return normalizeParsedOrderJson(JSON.parse(match[0]));
+      } catch {
+        // sigue a fallback de texto libre
+      }
     }
+
+    const fallbackLines = extractUsefulLinesFromRawText(text);
+    if (fallbackLines.length) {
+      return {
+        lines: fallbackLines,
+        notes: ['Lectura recuperada desde texto libre de la IA. Conviene revisarla.'],
+        uncertainLines: fallbackLines,
+      };
+    }
+
+    return { lines: [], notes: ['La IA no pudo devolver una lectura limpia.'], uncertainLines: ['Foto difícil de interpretar'] };
   }
+}
+
+function normalizeParsedOrderJson(parsed) {
+  return {
+    lines: Array.isArray(parsed?.lines) ? parsed.lines : [],
+    notes: Array.isArray(parsed?.notes) ? parsed.notes : [],
+    uncertainLines: Array.isArray(parsed?.uncertainLines) ? parsed.uncertainLines : [],
+  };
+}
+
+function extractUsefulLinesFromRawText(text) {
+  return String(text || '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .map((line) => line.replace(/^[-*•\d.)\s]+/, '').trim())
+    .filter(Boolean)
+    .filter((line) => !/^```/.test(line))
+    .filter((line) => !/^(json|lines|notes|uncertainLines)\b[:\s]*$/i.test(line))
+    .filter((line) => !/^[\[{()}\],]+$/.test(line))
+    .filter((line) => /[a-záéíóúñü]/i.test(line) && /\d/.test(line))
+    .slice(0, 40);
 }
 
 const port = Number(process.env.PORT || 3001);
