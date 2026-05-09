@@ -92,48 +92,20 @@ app.post('/api/read-order', upload.array('images', 12), async (req, res) => {
     }
 
     const ocrHints = await extractOrderOcrHints(files);
-    const content = [
-      {
-        type: 'input_text',
-        text: `Lee estas fotos de un pedido manuscrito de bebidas. A veces recibirás varias versiones de la misma hoja, por ejemplo original, escaneada suave, escaneada agresiva y recortes de la mitad superior o inferior. Úsalas como apoyo visual, pero NO dupliques líneas si ves la misma hoja varias veces. MUY IMPORTANTE: estas hojas suelen tener productos escritos en la columna izquierda y cantidades o formatos en la columna derecha, emparejados por filas. Debes relacionar cada producto con la cantidad de su misma altura aunque haya flechas, tachones o la hoja esté inclinada. Si la tinta es roja o tenue, intenta igualmente rescatar cada fila útil. Devuelve SOLO JSON válido con esta forma exacta: {"lines":["2 coca cola","1 larios"],"notes":["texto dudoso si hace falta"],"uncertainLines":["línea que no se entiende bien"]}. Reglas: 1) una línea por producto, 2) intenta corregir nombres evidentes de bebidas, 3) si la cantidad no está clara, asume 1 y añádelo en notes, 4) interpreta correctamente formatos como "Beefeater 1 caja", "Beefeater ---- 1 caja", "Beefeater 1 und", "Larios 1 ud", "Brugal 1 unidad" y devuelve siempre la cantidad al principio, 5) cuando aparezca UND, UD o UNIDAD significa unidad, 6) cuando aparezca CAJA o CAJAS significa caja, 7) no uses la x como formato de cantidad porque este cliente no la usa así, 8) si una línea no se entiende bien o dudas del texto, añádela también en uncertainLines para que quede marcada, 9) junta todas las fotos en un solo pedido, 10) si puedes leer al menos parte de la hoja, devuelve esas líneas útiles aunque no estén todas perfectas, 11) piensa fila por fila, no párrafo por párrafo, 12) prioriza productos y cantidades sobre explicaciones, 13) usa los recortes para fijarte solo en unas pocas filas cuando el documento completo confunda, 14) ejemplo válido de salida: ["1 beefeater caja","2 larios unidad","10 coca cola caja","4 barriles"], 15) si abajo incluyo pistas extraídas por OCR especializado, úsalas como apoyo pero corrige sus errores mirando la foto, 16) no expliques nada fuera del JSON.
+    const imageContent = files.map((file) => ({
+      type: 'input_image',
+      image_url: `data:${file.mimetype || 'image/jpeg'};base64,${file.buffer.toString('base64')}`,
+    }));
 
-PISTAS OCR PREVIAS:
-${ocrHints || '(sin pistas OCR previas útiles)'}`
-      },
-      ...files.map((file) => ({
-        type: 'input_image',
-        image_url: `data:${file.mimetype || 'image/jpeg'};base64,${file.buffer.toString('base64')}`,
-      })),
-    ];
+    const plainText = await transcribeOrderAsLines(process.env.OPENAI_API_KEY, imageContent, ocrHints);
+    let parsed = {
+      lines: extractUsefulLinesFromRawText(plainText),
+      notes: [],
+      uncertainLines: [],
+      raw: plainText,
+    };
 
-    let parsed = await readOrderWithOpenAI(process.env.OPENAI_API_KEY, content);
-    let firstLines = Array.isArray(parsed.lines) ? parsed.lines.filter(Boolean) : [];
-
-    if (!firstLines.length) {
-      parsed = await readOrderWithOpenAI(process.env.OPENAI_API_KEY, [
-        {
-          type: 'input_text',
-          text: 'Reintenta la lectura del pedido manuscrito. Piensa en una lista con productos a la izquierda y cantidades a la derecha, emparejadas por filas. Usa las distintas versiones de la misma hoja para rescatar tinta tenue o roja. Prioriza sacar líneas útiles aunque sean aproximadas. No devuelvas lines vacío si puedes leer aunque sea parte de la hoja. Si dudas, usa uncertainLines. Devuelve solo JSON válido.',
-        },
-        ...content,
-      ]);
-      firstLines = Array.isArray(parsed.lines) ? parsed.lines.filter(Boolean) : [];
-    }
-
-    if (!firstLines.length) {
-      const transcription = await transcribeOrderText(process.env.OPENAI_API_KEY, content);
-      const recoveredLines = extractUsefulLinesFromRawText(transcription);
-      if (recoveredLines.length) {
-        parsed = {
-          lines: recoveredLines,
-          notes: ['Lectura recuperada desde transcripción libre de la hoja. Revísala.'],
-          uncertainLines: recoveredLines,
-          raw: transcription,
-        };
-      }
-    }
-
-    if ((!Array.isArray(parsed.lines) || !parsed.lines.length) && ocrHints) {
+    if (!parsed.lines.length && ocrHints) {
       const hintLines = extractUsefulLinesFromRawText(ocrHints);
       if (hintLines.length) {
         parsed = {
@@ -223,11 +195,14 @@ function normalizeOcrText(text) {
     .trim();
 }
 
-async function readOrderWithOpenAI(apiKey, content) {
-  const text = await callOpenAIText(apiKey, content);
-  const cleaned = text.replace(/^```json\s*/i, '').replace(/^```/i, '').replace(/```$/i, '').trim();
-  const parsed = safeParseOrderJson(cleaned);
-  return { ...parsed, raw: cleaned };
+async function transcribeOrderAsLines(apiKey, imageContent, ocrHints) {
+  return callOpenAIText(apiKey, [
+    {
+      type: 'input_text',
+      text: `Lee estas fotos de un pedido manuscrito de bebidas y devuelve SOLO texto plano, una línea final de pedido por fila. No devuelvas JSON ni explicaciones. Reglas: 1) si hay varias versiones o recortes de la misma hoja, úsalos como apoyo pero no dupliques líneas, 2) los productos suelen ir a la izquierda y las cantidades o formatos a la derecha, 3) devuelve la cantidad al principio cuando puedas, 4) si la cantidad no está clara usa 1, 5) piensa fila por fila, 6) corrige nombres evidentes de bebidas, 7) si ves "bot.", "ud", "uds", "caja", "cajas", "barriles", "tercios" o similar, consérvalo al final de la línea, 8) ejemplos válidos: "2 cerveza barril jarras", "1 bot machaquito dulce", "3 tercios", "10 lata atun".${ocrHints ? `\n\nPISTAS OCR PREVIAS:\n${ocrHints}` : ''}`,
+    },
+    ...imageContent,
+  ]);
 }
 
 async function transcribeOrderText(apiKey, content) {
