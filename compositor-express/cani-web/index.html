@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>App Clasificador de Pedidos</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero hero-cover">
+      <div class="hero-left">
+        <p class="cover-brand">CANI-APP</p>
+        <h1 class="cover-title">Clasificador<br>de Pedidos</h1>
+      </div>
+      <div class="hero-center">
+        <img class="hero-logo" src="./logo-betis.jpg" alt="Portada de referencia CANI-APP" />
+      </div>
+      <div class="hero-actions hero-actions-cover">
+        <button id="classifyBtn" class="btn btn-primary">Clasificar pedido</button>
+        <button id="copyBtn" class="btn btn-secondary">Copiar resultado</button>
+      </div>
+    </header>
+
+    <section class="stats-strip">
+      <div class="stat-card">
+        <span class="stat-label">Líneas</span>
+        <strong id="linesBadge" class="stat-value">0</strong>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Categorías</span>
+        <strong id="categoriesBadge" class="stat-value">0</strong>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Productos</span>
+        <strong id="productsBadge" class="stat-value">0</strong>
+      </div>
+    </section>
+
+    <main class="layout">
+      <section class="panel stack gap-lg">
+        <h2>Pedido en bruto</h2>
+        <label>
+          Pega o escribe el pedido
+          <textarea id="rawInput" rows="18" placeholder="4 Puerto de Indias&#10;1 Larios normal&#10;6 Seagram&#10;24 Barceló&#10;20 Coca Cola&#10;12 Cruzcampo"></textarea>
+        </label>
+        <div class="actions-wrap">
+          <label class="file-drop">
+            <span>Subir foto(s) del pedido</span>
+            <input id="imageInput" type="file" accept="image/*" multiple />
+          </label>
+          <button id="ocrBtn" class="btn btn-secondary">Leer foto(s)</button>
+          <button id="resetBtn" class="btn btn-ghost">Limpiar</button>
+        </div>
+        <div id="ocrStatus" class="ocr-status">Puedes subir una foto escrita a mano y la app intentará pasarla a texto.</div>
+        <div id="imagePreviewWrap" class="image-preview" hidden>
+          <img id="imagePreview" alt="Vista previa del pedido" />
+        </div>
+        <div>
+          <h3>Avisos</h3>
+          <ul id="issuesList" class="issues-list"></ul>
+        </div>
+      </section>
+
+      <section class="panel stack gap-lg">
+        <h2>Clasificación</h2>
+        <div id="categoryCards" class="category-cards"></div>
+      </section>
+
+      <section id="reviewBlock" class="panel stack gap-lg full-width review-panel" hidden>
+        <div class="section-title-row">
+          <h2>REVISAR</h2>
+          <span class="badge review-badge">Importante</span>
+        </div>
+        <p class="helper-text">Estas líneas han salido dudosas o necesitan que alguien las mire antes de dar el pedido por bueno.</p>
+        <ul id="reviewList" class="review-list"></ul>
+      </section>
+
+      <section class="panel stack gap-lg full-width">
+        <div class="section-title-row">
+          <h2>Revisión manual</h2>
+          <span class="badge">Editable</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Cantidad</th>
+                <th>Producto</th>
+                <th>Categoría</th>
+              </tr>
+            </thead>
+            <tbody id="previewTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel stack gap-lg full-width">
+        <div class="section-title-row">
+          <h2>Memoria</h2>
+          <button id="toggleMemoryBtn" class="btn btn-secondary btn-sm">Abrir memoria</button>
+        </div>
+        <div id="memoryPanel" hidden>
+          <p class="helper-text">Si aparece un producto nuevo, escríbelo aquí una sola vez y la app lo recordará para la próxima.</p>
+          <div class="memory-form-grid">
+            <label>
+              Nombre del producto
+              <input id="memoryProductInput" type="text" placeholder="Ejemplo: Seven Up" />
+            </label>
+            <label>
+              Categoría
+              <select id="memoryCategoryInput"></select>
+            </label>
+          </div>
+          <div class="actions-wrap">
+            <button id="saveMemoryBtn" class="btn btn-primary">Guardar producto en memoria</button>
+            <button id="cancelMemoryEditBtn" class="btn btn-ghost" hidden>Cancelar edición</button>
+          </div>
+          <div id="memoryStatus" class="ocr-status">Aquí verás si el producto se ha guardado bien.</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto guardado</th>
+                  <th>Categoría</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="memoryTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel stack gap-lg full-width">
+        <div class="section-title-row">
+          <h2>Texto final</h2>
+          <button id="whatsBtn" class="btn btn-secondary btn-sm">Copiar para WhatsApp</button>
+        </div>
+        <pre id="outputText" class="output-box">Aquí aparecerá el pedido clasificado.</pre>
+      </section>
+    </main>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
