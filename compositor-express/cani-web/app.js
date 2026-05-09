@@ -468,7 +468,8 @@ async function handleImageSelected(event) {
   state.imageDataUrls = previews;
   els.imagePreview.src = previews[0] || '';
   els.imagePreviewWrap.hidden = !previews[0];
-  setOcrStatus(`${files.length} foto(s) cargadas. Pulsa "Leer foto(s)" para convertirlas a texto.`);
+  setOcrStatus(`${files.length} foto(s) cargadas. Leyendo automáticamente...`);
+  await runOCRFromSelectedImage();
 }
 
 async function runOCRFromSelectedImage() {
