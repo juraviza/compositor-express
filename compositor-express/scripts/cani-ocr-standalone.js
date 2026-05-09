@@ -5,7 +5,7 @@ const path = require('path');
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 12 * 1024 * 1024 } });
-const webRoot = path.resolve(__dirname, '../../cani-web-phase1');
+const webRoot = path.resolve(__dirname, '../../clasificador-pedidos-app');
 const caniUser = process.env.CANI_USER || 'canijo';
 const caniPass = process.env.CANI_PASS || 'cani1234';
 
