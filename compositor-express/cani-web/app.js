@@ -508,7 +508,7 @@ async function runOCRFromSelectedImage() {
     if (!text.trim()) {
       const rough = Array.isArray(data.uncertainLines) ? data.uncertainLines.join('\n') : '';
       const rawFallback = typeof data.raw === 'string' ? data.raw.trim() : '';
-      const recovered = rough.trim() || rawFallback;
+      const recovered = isGenericOcrFailure(rough.trim()) ? rawFallback : (rough.trim() || rawFallback);
       if (recovered) {
         const previousText = String(els.rawInput.value || '').trim();
         els.rawInput.value = previousText ? `${previousText}\n${recovered}` : recovered;
@@ -546,6 +546,11 @@ function setOcrStatus(message) {
   els.ocrStatus.textContent = message;
 }
 
+function isGenericOcrFailure(text) {
+  const value = String(text || '').trim().toLowerCase();
+  return value === 'foto difícil de interpretar' || value === 'foto dificil de interpretar';
+}
+
 function readFileAsDataUrl(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -572,17 +577,19 @@ async function enhanceImageForOCR(file) {
   const originalBlob = await new Promise((resolve) => baseCanvas.toBlob(resolve, 'image/jpeg', 0.98));
   const graySoftBlob = await createProcessedOcrBlob(baseCanvas, { lowQ: 0.06, highQ: 0.94, whiteCut: 198, blackCut: 82, gamma: 0.9 });
   const grayHardBlob = await createProcessedOcrBlob(baseCanvas, { lowQ: 0.04, highQ: 0.96, whiteCut: 212, blackCut: 72, gamma: 0.82 });
+  const bwDocBlob = await createProcessedOcrBlob(baseCanvas, { lowQ: 0.03, highQ: 0.97, whiteCut: 222, blackCut: 92, gamma: 0.78, binaryThreshold: 168 });
   const baseName = file.name.replace(/\.[^.]+$/, '');
 
   return [
     new File([originalBlob], `${baseName}-original.jpg`, { type: 'image/jpeg' }),
     new File([graySoftBlob], `${baseName}-scan-soft.jpg`, { type: 'image/jpeg' }),
     new File([grayHardBlob], `${baseName}-scan-hard.jpg`, { type: 'image/jpeg' }),
+    new File([bwDocBlob], `${baseName}-scan-bw.jpg`, { type: 'image/jpeg' }),
   ];
 }
 
 async function createProcessedOcrBlob(sourceCanvas, options) {
-  const { lowQ, highQ, whiteCut, blackCut, gamma } = options;
+  const { lowQ, highQ, whiteCut, blackCut, gamma, binaryThreshold } = options;
   const width = sourceCanvas.width;
   const height = sourceCanvas.height;
   const scanCanvas = document.createElement('canvas');
@@ -610,6 +617,9 @@ async function createProcessedOcrBlob(sourceCanvas, options) {
     gray = Math.max(0, Math.min(255, ((gray - low) * 255) / range));
     gray = 255 * Math.pow(gray / 255, gamma);
     gray = gray > whiteCut ? 255 : gray < blackCut ? 0 : gray;
+    if (typeof binaryThreshold === 'number') {
+      gray = gray >= binaryThreshold ? 255 : 0;
+    }
     data[i] = gray;
     data[i + 1] = gray;
     data[i + 2] = gray;
