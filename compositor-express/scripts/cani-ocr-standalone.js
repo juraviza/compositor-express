@@ -126,14 +126,32 @@ ${ocrHints || '(sin pistas OCR previas útiles)'}`
     }
 
     if ((!Array.isArray(parsed.lines) || !parsed.lines.length) && ocrHints) {
-      const recoveredLines = extractUsefulLinesFromRawText(ocrHints);
-      if (recoveredLines.length) {
+      const hintLines = extractUsefulLinesFromRawText(ocrHints);
+      if (hintLines.length) {
         parsed = {
-          lines: recoveredLines,
+          lines: hintLines,
           notes: ['Lectura recuperada desde OCR dedicado previo. Revísala.'],
-          uncertainLines: recoveredLines,
+          uncertainLines: hintLines,
           raw: ocrHints,
         };
+      } else {
+        const textOnlyRecovery = await recoverOrderFromOcrHints(process.env.OPENAI_API_KEY, ocrHints);
+        const recoveredLines = extractUsefulLinesFromRawText(textOnlyRecovery);
+        if (recoveredLines.length) {
+          parsed = {
+            lines: recoveredLines,
+            notes: ['Lectura recuperada a partir del OCR dedicado previo. Revísala.'],
+            uncertainLines: recoveredLines,
+            raw: textOnlyRecovery,
+          };
+        } else {
+          parsed = {
+            lines: [],
+            notes: ['El OCR dedicado sacó texto parcial, pero no pude estructurarlo bien.'],
+            uncertainLines: [],
+            raw: ocrHints,
+          };
+        }
       }
     }
 
@@ -207,6 +225,15 @@ async function transcribeOrderText(apiKey, content) {
   ]);
 }
 
+async function recoverOrderFromOcrHints(apiKey, ocrHints) {
+  return callOpenAIText(apiKey, [
+    {
+      type: 'input_text',
+      text: `A partir de este texto OCR imperfecto de una hoja de pedido manuscrita, reconstruye una lista simple de pedido. Devuelve solo líneas de pedido, una por línea, con la cantidad al principio cuando se pueda inferir. Si una cantidad no está clara, usa 1. No devuelvas JSON ni explicaciones.\n\nTEXTO OCR:\n${ocrHints}`,
+    },
+  ]);
+}
+
 async function callOpenAIText(apiKey, content) {
   const response = await fetch('https://api.openai.com/v1/responses', {
     method: 'POST',
@@ -268,7 +295,8 @@ function extractUsefulLinesFromRawText(text) {
     .filter((line) => !/^```/.test(line))
     .filter((line) => !/^(json|lines|notes|uncertainLines)\b[:\s]*$/i.test(line))
     .filter((line) => !/^[\[{()}\],]+$/.test(line))
-    .filter((line) => /[a-záéíóúñü]/i.test(line) && /\d/.test(line))
+    .filter((line) => /[a-záéíóúñü]/i.test(line))
+    .filter((line) => line.length >= 3)
     .slice(0, 40);
 }
 
