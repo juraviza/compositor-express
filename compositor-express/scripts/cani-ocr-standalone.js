@@ -5,9 +5,21 @@ const path = require('path');
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 12 * 1024 * 1024 } });
-const webRoot = path.resolve(__dirname, '../cani-web');
 const caniUser = process.env.CANI_USER || 'canijo';
 const caniPass = process.env.CANI_PASS || 'cani1234';
+
+const webRootCandidates = [
+  path.resolve(__dirname, '../cani-web'),
+  path.resolve(__dirname, '../../cani-web'),
+  path.resolve(__dirname, '../../compositor-express/cani-web'),
+  path.resolve(process.cwd(), 'cani-web'),
+  path.resolve(process.cwd(), 'compositor-express/cani-web'),
+];
+const webRoot = webRootCandidates.find((candidate) => fs.existsSync(path.join(candidate, 'index.html')));
+
+if (!webRoot) {
+  console.error('CANI web root not found. Checked:', webRootCandidates);
+}
 
 function caniAuth(req, res, next) {
   const auth = req.headers.authorization || '';
@@ -43,10 +55,18 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.get(['/cani', '/cani/'], caniAuth, (_req, res) => {
+  if (!webRoot) {
+    return res.status(500).send('CANI web root not found on server');
+  }
   res.type('html').send(fs.readFileSync(path.join(webRoot, 'index.html'), 'utf8'));
 });
 
-app.use('/cani', caniAuth, express.static(webRoot, { index: false }));
+app.use('/cani', caniAuth, (req, res, next) => {
+  if (!webRoot) {
+    return res.status(500).send('CANI web root not found on server');
+  }
+  return express.static(webRoot, { index: false })(req, res, next);
+});
 
 app.post('/api/read-order', upload.array('images', 6), async (req, res) => {
   try {
