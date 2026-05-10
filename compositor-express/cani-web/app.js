@@ -15,6 +15,9 @@ const DEFAULT_PRODUCT_MEMORY = {
   'bombay': 'Bebidas alcohólicas',
   'bombay sapphire': 'Bebidas alcohólicas',
   'martin miller': 'Bebidas alcohólicas',
+  'machaquito dulce': 'Bebidas alcohólicas',
+  'machaquito seco': 'Bebidas alcohólicas',
+  'castellana': 'Cervezas',
   'anis dulce': 'Bebidas alcohólicas',
   'ano dulce': 'Bebidas alcohólicas',
   'aino dulce': 'Bebidas alcohólicas',
@@ -190,11 +193,12 @@ const DEFAULT_PRODUCT_MEMORY = {
 
 const KEYWORDS = [
   { category: 'Bebidas alcohólicas', terms: ['puerto de indias', 'larios', 'rives', 'seagram', 'segram', 'beefeater', 'befeter', 'tanqueray', 'nordes', 'nordés', 'gordons', 'bombay', 'ginebra'] },
+  { category: 'Bebidas alcohólicas', terms: ['machaquito', 'anis dulce', 'anís dulce', 'martin miller', 'black label', 'red label', 'whisky', 'ron', 'vermut'] },
   { category: 'Bebidas alcohólicas', terms: ['barcelo', 'barceló', 'brugal', 'cacique', 'legendario', 'santa teresa', 'havana club', 'bacardi', 'arehucas', 'ron', 'exotica', 'exótica'] },
   { category: 'Bebidas alcohólicas', terms: ['ballant', 'ballantais', 'jyb', 'j&b', 'white label', 'joni', 'johnnie', 'joni rojo', 'joni negro', 'cien piper', '100 pipers', 'passport', 'dyc', 'jameson', 'macallan', 'whisky'] },
   { category: 'Bebidas alcohólicas', terms: ['absolut', 'smirnoff', 'ciroc', 'cîroc', 'bailes', 'baileys', 'tequila', 'jager', 'jäger', 'maria brizard', 'maría brizar', 'anis del mono', 'anís del mono', 'anis dulce', 'anís dulce', 'ano dulce', 'aino dulce', 'martin miller', 'licor 43', 'vodca', 'vodka', 'licor'] },
   { category: 'Refrescos', terms: ['coca cola', 'cocacola', 'cola', 'coca caja', 'coca pet', 'fanta', 'sprite', 'tonica', 'tónica', 'limonada', 'neste', 'nestea', 'aquarios', 'aquarius', 'kas', 'zero'] },
-  { category: 'Cervezas', terms: ['cruzcampo', 'heineken', 'heniker', 'radler', 'aguila', 'águila', 'estrella', 'victoria', 'mahou', 'amstel', 'alhambra', 'san miguel', 'quinto especial', 'cerveza', 'barril', 'barriles', 'parril', 'parriles'] },
+  { category: 'Cervezas', terms: ['cruzcampo', 'castellana', 'heineken', 'heniker', 'radler', 'corona', 'desperados', 'aguila', 'águila', 'estrella', 'victoria', 'mahou', 'amstel', 'alhambra', 'san miguel', 'quinto especial', 'tercio', 'tercios', 'cerveza', 'barril', 'barriles', 'parril', 'parriles'] },
   { category: 'Refrescos', terms: ['agua', 'monster', 'moster', 'red bull', 'burn', 'font vella', 'lanjaron', 'lanjaron', 'cabreiroa', 'aquabona'] },
   { category: 'Bebidas alcohólicas', terms: ['martini', 'miura', 'vermut', 'rioja', 'ribera', 'lambrusco', 'vino'] },
   { category: 'Cocina y despensa', terms: ['tomate', 'alcachof', 'champiñ', 'champiñ', 'esparrag', 'maiz', 'maíz', 'zanahoria', 'atun', 'atún', 'aceituna', 'pepinillo', 'piquillo', 'espinaca', 'garbanzo', 'judia', 'judía', 'lenteja', 'aceite', 'vinagre', 'sal', 'azucar', 'azúcar', 'harina', 'arroz', 'pasta', 'queso', 'mozzarella', 'mayonesa', 'ketchup', 'mostaza', 'salsa', 'caldo', 'nata cocinar', 'leche evaporada', 'huevo', 'patata'] },
@@ -336,6 +340,11 @@ function normalizeOcrLine(line) {
     .replace(/\bBefeter\b/gi, 'Beefeater')
     .replace(/\bSegram\b/gi, 'Seagram')
     .replace(/\bMoster\b/gi, 'Monster')
+    .replace(/\bMachas?quito\b/gi, 'Machaquito')
+    .replace(/\bCastellana\b/gi, 'Castellana')
+    .replace(/\bLario\s+12\b/gi, 'Larios 12')
+    .replace(/\bNeste\b/gi, 'Nestea')
+    .replace(/\bCola\s+0\b/gi, 'Coca Cola Zero')
     .replace(/\bCola\b/gi, 'Coca Cola')
     .replace(/\bAno\s+Dulce\b/gi, 'Anis Dulce')
     .replace(/\bAino\s+Dulce\b/gi, 'Anis Dulce')
