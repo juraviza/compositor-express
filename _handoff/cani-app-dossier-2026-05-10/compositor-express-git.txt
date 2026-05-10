@@ -1,0 +1,117 @@
+[git status --short]
+ M dist/tsconfig.build.tsbuildinfo
+ M node_modules/.package-lock.json
+ M node_modules/.prisma/client/default.d.ts
+ M node_modules/.prisma/client/default.js
+ M node_modules/.prisma/client/edge.d.ts
+ M node_modules/.prisma/client/edge.js
+ M node_modules/.prisma/client/index-browser.js
+ M node_modules/.prisma/client/index.d.ts
+ M node_modules/.prisma/client/index.js
+ M node_modules/.prisma/client/wasm.d.ts
+ M node_modules/.prisma/client/wasm.js
+ D prisma/node_modules/.prisma/client/client.d.ts
+ D prisma/node_modules/.prisma/client/client.js
+ D prisma/node_modules/.prisma/client/default.d.ts
+ D prisma/node_modules/.prisma/client/default.js
+ D prisma/node_modules/.prisma/client/edge.d.ts
+ D prisma/node_modules/.prisma/client/edge.js
+ D prisma/node_modules/.prisma/client/index-browser.js
+ D prisma/node_modules/.prisma/client/index.d.ts
+ D prisma/node_modules/.prisma/client/index.js
+ D prisma/node_modules/.prisma/client/libquery_engine-debian-openssl-3.0.x.so.node
+ D prisma/node_modules/.prisma/client/libquery_engine-linux-musl-openssl-3.0.x.so.node
+ D prisma/node_modules/.prisma/client/package.json
+ D prisma/node_modules/.prisma/client/runtime/edge-esm.js
+ D prisma/node_modules/.prisma/client/runtime/edge.js
+ D prisma/node_modules/.prisma/client/runtime/index-browser.d.ts
+ D prisma/node_modules/.prisma/client/runtime/index-browser.js
+ D prisma/node_modules/.prisma/client/runtime/library.d.ts
+ D prisma/node_modules/.prisma/client/runtime/library.js
+ D prisma/node_modules/.prisma/client/runtime/react-native.js
+ D prisma/node_modules/.prisma/client/runtime/wasm.js
+ D prisma/node_modules/.prisma/client/schema.prisma
+ D prisma/node_modules/.prisma/client/wasm.d.ts
+ D prisma/node_modules/.prisma/client/wasm.js
+ M react_native/app.json
+ M react_native/package.json
+ M react_native/yarn.lock
+?? ../.keys/
+?? ../_audio/
+?? ../_espanadtf-3/
+?? ../_espanadtf-dtf-real/
+?? ../_espanadtf-previa/
+?? ../_handoff/
+?? ../_headings/
+?? ../_mockups/
+?? ../_preview/
+?? ../_preview2/
+?? ../_preview3/
+?? ../_shots/
+?? ../_tmp/
+?? ../cani-acdc-taz-upscaled-exact-8k.png
+?? ../cani-acdc-taz-upscaled-exact-hq.png
+?? ../cani-acdc-taz-upscaled-exact.png
+?? ../cani-acdc-taz-upscaled-max-detail.jpg
+?? ../cani-web-phase1/cani-tunnel.log
+?? ../cani-web-phase1/cani-tunnel.pid
+?? ../cani-web-phase1/cani-web.log
+?? ../cani-web-phase1/cani-web.pid
+?? ../cani-web-phase1/tunnel.sh
+?? ../clasificador-pedidos-app/memoria-caniapp.html
+?? ../clasificador-pedidos-app/memoria-caniapp.pdf
+?? ../clasificador-pedidos-app/node_modules/
+?? react_native/eas.json
+?? react_native/package-lock.json
+?? ../dtf-cuentas-app/dtf-cuentas-full.png
+?? ../dtf-cuentas-app/dtf-cuentas-home.png
+?? ../memory/.dreams/
+?? ../memory/2026-04-28.md
+?? ../memory/2026-04-29.md
+?? ../memory/2026-04-30.md
+?? ../memory/2026-05-02-agent-switch.md
+?? ../memory/2026-05-02.md
+?? ../memory/2026-05-03.md
+?? ../memory/2026-05-05.md
+?? ../memory/2026-05-08.md
+?? ../memory/2026-05-09.md
+?? ../node_modules/
+?? ../reply_apk_status_voice.mp3
+?? ../telegram_voice_test.mp3
+?? ../telegram_voice_test_andaluz.mp3
+?? ../telegram_voice_test_andaluz_mas_vida.mp3
+?? ../telegram_voice_test_male_2.mp3
+?? ../telegram_voice_test_male_deeper.mp3
+?? ../telegram_voice_test_male_energetic.mp3
+?? ../telegram_voice_test_picaro.mp3
+?? ../telegram_voice_test_style_defined.mp3
+
+[git log --oneline -n 20]
+66be4a5e (HEAD -> main) Tune CANI OCR for real order samples
+871c7f92 Improve CANI OCR with column crops
+f8723159 Use plain-text vision transcription for CANI orders
+a0cc2f9b Bundle local tessdata for CANI OCR
+1bb3f8a7 Recover CANI lines from OCR hints more aggressively
+448aa918 Add dedicated OCR pre-pass for CANI photos
+86111089 Send OCR page crops for CANI photos
+983ddd68 Add plain-text OCR fallback for CANI
+e43004af Add strong black-and-white OCR variant for CANI
+789d65ea Make CANI web public by default
+ba0fdaa6 Strengthen CANI OCR image prep and prompt
+b683d9cd Auto-run OCR when CANI photos are uploaded
+80ed130b Improve CANI OCR fallback parsing
+f150b9f9 Make CANI web root resolution robust on Render
+ede66014 Bundle CANI web into compositor-express
+9d31bf1f (origin/main) Serve CANI web from clasificador-pedidos-app
+70d6dc64 Run CANI OCR standalone server in production
+b07ba33b Serve CANI web from standalone OCR app
+51d85428 Fix CANI web HTML extraction
+106f684f Add local deploy script for CANI web
+
+[branches]
+* main   66be4a5e Tune CANI OCR for real order samples
+  master 798754c8 [origin/master] Remove yarn packageManager to use npm
+
+[remotes]
+origin	git@github.com:juraviza/compositor-express.git (fetch)
+origin	git@github.com:juraviza/compositor-express.git (push)

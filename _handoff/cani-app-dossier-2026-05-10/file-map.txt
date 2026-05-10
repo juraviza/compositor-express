@@ -1,0 +1,18 @@
+[compositor-express key files]
+compositor-express/cani-web/app.js
+compositor-express/cani-web/index.html
+compositor-express/cani-web/logo-betis.jpg
+compositor-express/cani-web/portada-referencia.jpg
+compositor-express/cani-web/styles.css
+compositor-express/package.json
+compositor-express/react_native/package.json
+compositor-express/scripts/cani-ocr-standalone.js
+
+[clasificador-pedidos-app key files]
+clasificador-pedidos-app/app.js
+clasificador-pedidos-app/index.html
+clasificador-pedidos-app/memoria-caniapp.html
+clasificador-pedidos-app/memoria-caniapp.pdf
+clasificador-pedidos-app/package.json
+clasificador-pedidos-app/server.js
+clasificador-pedidos-app/styles.css
