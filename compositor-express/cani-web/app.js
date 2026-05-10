@@ -580,16 +580,16 @@ async function enhanceImageForOCR(file) {
   const bwDocBlob = await createProcessedOcrBlob(baseCanvas, { lowQ: 0.03, highQ: 0.97, whiteCut: 222, blackCut: 92, gamma: 0.78, binaryThreshold: 168 });
   const baseName = file.name.replace(/\.[^.]+$/, '');
 
-  const upperCropBlob = await createCroppedOcrBlob(baseCanvas, { topRatio: 0.0, heightRatio: 0.62 });
-  const lowerCropBlob = await createCroppedOcrBlob(baseCanvas, { topRatio: 0.38, heightRatio: 0.62 });
+  const leftColumnBlob = await createCroppedOcrBlob(baseCanvas, { leftRatio: 0.0, widthRatio: 0.58 });
+  const rightColumnBlob = await createCroppedOcrBlob(baseCanvas, { leftRatio: 0.42, widthRatio: 0.58 });
 
   return [
     new File([originalBlob], `${baseName}-original.jpg`, { type: 'image/jpeg' }),
     new File([graySoftBlob], `${baseName}-scan-soft.jpg`, { type: 'image/jpeg' }),
     new File([grayHardBlob], `${baseName}-scan-hard.jpg`, { type: 'image/jpeg' }),
     new File([bwDocBlob], `${baseName}-scan-bw.jpg`, { type: 'image/jpeg' }),
-    new File([upperCropBlob], `${baseName}-crop-top.jpg`, { type: 'image/jpeg' }),
-    new File([lowerCropBlob], `${baseName}-crop-bottom.jpg`, { type: 'image/jpeg' }),
+    new File([leftColumnBlob], `${baseName}-crop-left.jpg`, { type: 'image/jpeg' }),
+    new File([rightColumnBlob], `${baseName}-crop-right.jpg`, { type: 'image/jpeg' }),
   ];
 }
 
@@ -635,16 +635,18 @@ async function createProcessedOcrBlob(sourceCanvas, options) {
 }
 
 async function createCroppedOcrBlob(sourceCanvas, options) {
-  const { topRatio, heightRatio } = options;
+  const { topRatio = 0, heightRatio = 1, leftRatio = 0, widthRatio = 1 } = options;
   const srcW = sourceCanvas.width;
   const srcH = sourceCanvas.height;
+  const x = Math.max(0, Math.floor(srcW * leftRatio));
   const y = Math.max(0, Math.floor(srcH * topRatio));
+  const w = Math.max(1, Math.min(srcW - x, Math.floor(srcW * widthRatio)));
   const h = Math.max(1, Math.min(srcH - y, Math.floor(srcH * heightRatio)));
   const cropCanvas = document.createElement('canvas');
-  cropCanvas.width = srcW;
+  cropCanvas.width = w;
   cropCanvas.height = h;
   const cropCtx = cropCanvas.getContext('2d', { willReadFrequently: true });
-  cropCtx.drawImage(sourceCanvas, 0, y, srcW, h, 0, 0, srcW, h);
+  cropCtx.drawImage(sourceCanvas, x, y, w, h, 0, 0, w, h);
   return new Promise((resolve) => cropCanvas.toBlob(resolve, 'image/jpeg', 0.98));
 }
 

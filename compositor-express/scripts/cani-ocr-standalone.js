@@ -92,7 +92,7 @@ app.post('/api/read-order', upload.array('images', 12), async (req, res) => {
     }
 
     const ocrHints = await extractOrderOcrHints(files);
-    const imageContent = files.map((file) => ({
+    const imageContent = files.slice(0, 12).map((file) => ({
       type: 'input_image',
       image_url: `data:${file.mimetype || 'image/jpeg'};base64,${file.buffer.toString('base64')}`,
     }));
@@ -147,7 +147,7 @@ app.post('/api/read-order', upload.array('images', 12), async (req, res) => {
 
 async function extractOrderOcrHints(files) {
   const chunks = [];
-  for (const file of files.slice(0, 6)) {
+  for (const file of files.slice(0, 12)) {
     try {
       const processed = await preprocessForDedicatedOcr(file.buffer);
       const text = await runDedicatedOcr(processed);
@@ -199,7 +199,7 @@ async function transcribeOrderAsLines(apiKey, imageContent, ocrHints) {
   return callOpenAIText(apiKey, [
     {
       type: 'input_text',
-      text: `Lee estas fotos de un pedido manuscrito de bebidas y devuelve SOLO texto plano, una línea final de pedido por fila. No devuelvas JSON ni explicaciones. Reglas: 1) si hay varias versiones o recortes de la misma hoja, úsalos como apoyo pero no dupliques líneas, 2) los productos suelen ir a la izquierda y las cantidades o formatos a la derecha, 3) devuelve la cantidad al principio cuando puedas, 4) si la cantidad no está clara usa 1, 5) piensa fila por fila, 6) corrige nombres evidentes de bebidas, 7) si ves "bot.", "ud", "uds", "caja", "cajas", "barriles", "tercios" o similar, consérvalo al final de la línea, 8) ejemplos válidos: "2 cerveza barril jarras", "1 bot machaquito dulce", "3 tercios", "10 lata atun".${ocrHints ? `\n\nPISTAS OCR PREVIAS:\n${ocrHints}` : ''}`,
+      text: `Lee estas fotos de un pedido manuscrito de bebidas y devuelve SOLO texto plano, una línea final de pedido por fila. No devuelvas JSON ni explicaciones. Reglas: 1) si hay varias versiones o recortes de la misma hoja, úsalos como apoyo pero no dupliques líneas, 2) los productos suelen ir a la izquierda y las cantidades o formatos a la derecha, 3) si recibes recortes de la mitad izquierda o derecha de la hoja, úsalos para alinear mejor cada fila entre producto y cantidad, 4) devuelve la cantidad al principio cuando puedas, 5) si la cantidad no está clara usa 1, 6) piensa fila por fila, 7) corrige nombres evidentes de bebidas, 8) si ves "bot.", "ud", "uds", "caja", "cajas", "barriles", "tercios" o similar, consérvalo al final de la línea, 9) ejemplos válidos: "2 cerveza barril jarras", "1 bot machaquito dulce", "3 tercios", "10 lata atun".${ocrHints ? `\n\nPISTAS OCR PREVIAS:\n${ocrHints}` : ''}`,
     },
     ...imageContent,
   ]);
