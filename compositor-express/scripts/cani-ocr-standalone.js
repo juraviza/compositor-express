@@ -98,19 +98,20 @@ app.use('/cani', caniAuth, (req, res, next) => {
   return express.static(webRoot, { index: false })(req, res, next);
 });
 
-app.post('/api/read-order', upload.array('images', 12), async (req, res) => {
+app.post('/api/read-order', upload.array('images', 24), async (req, res) => {
   try {
     if (!process.env.OPENAI_API_KEY) {
       return res.status(503).json({ ok: false, message: 'Falta configurar OPENAI_API_KEY en el servidor.' });
     }
 
     const files = Array.isArray(req.files) ? req.files : [];
-    if (!files.length) {
+    const usableFiles = files.slice(0, 24);
+    if (!usableFiles.length) {
       return res.status(400).json({ ok: false, message: 'No se ha recibido ninguna imagen.' });
     }
 
-    const ocrHints = await extractOrderOcrHints(files);
-    const imageContent = files.slice(0, 12).map((file) => ({
+    const ocrHints = await extractOrderOcrHints(usableFiles);
+    const imageContent = usableFiles.map((file) => ({
       type: 'input_image',
       image_url: `data:${file.mimetype || 'image/jpeg'};base64,${file.buffer.toString('base64')}`,
     }));
@@ -165,7 +166,7 @@ app.post('/api/read-order', upload.array('images', 12), async (req, res) => {
 
 async function extractOrderOcrHints(files) {
   const chunks = [];
-  for (const file of files.slice(0, 12)) {
+  for (const file of files.slice(0, 24)) {
     try {
       const processed = await preprocessForDedicatedOcr(file.buffer);
       const text = await runDedicatedOcr(processed);
