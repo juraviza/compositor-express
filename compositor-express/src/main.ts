@@ -20,13 +20,24 @@ async function bootstrap() {
     next();
   });
 
-  const healthPayload = { ok: true, vision: !!process.env.OPENAI_API_KEY, service: 'cani-ocr' };
+  const commit = process.env.RENDER_GIT_COMMIT || process.env.COMMIT_SHA || process.env.GIT_COMMIT || 'unknown';
+  const deployedAt = new Date().toISOString();
+  const healthPayload = { ok: true, vision: !!process.env.OPENAI_API_KEY, service: 'cani-ocr', commit, deployedAt };
+
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    res.setHeader('X-CANI-Commit', commit);
+    next();
+  });
 
   app.use('/api/vision-health', (_req: Request, res: Response) => {
     res.json(healthPayload);
   });
 
   app.use('/api/health', (_req: Request, res: Response) => {
+    res.json(healthPayload);
+  });
+
+  app.use('/api/version', (_req: Request, res: Response) => {
     res.json(healthPayload);
   });
 

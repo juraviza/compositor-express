@@ -10,6 +10,8 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 12 
 const caniUser = process.env.CANI_USER || 'canijo';
 const caniPass = process.env.CANI_PASS || 'cani1234';
 const caniPublic = String(process.env.CANI_PUBLIC || 'true').toLowerCase() === 'true';
+const caniCommit = process.env.RENDER_GIT_COMMIT || process.env.COMMIT_SHA || process.env.GIT_COMMIT || 'unknown';
+const caniDeployedAt = new Date().toISOString();
 
 const webRootCandidates = [
   path.resolve(__dirname, '../cani-web'),
@@ -54,16 +56,32 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('X-CANI-Commit', caniCommit);
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });
 
+function buildHealthPayload() {
+  return {
+    ok: true,
+    vision: !!process.env.OPENAI_API_KEY,
+    standalone: true,
+    service: 'cani-ocr',
+    commit: caniCommit,
+    deployedAt: caniDeployedAt,
+  };
+}
+
 app.get('/api/vision-health', (_req, res) => {
-  res.json({ ok: true, vision: !!process.env.OPENAI_API_KEY, standalone: true });
+  res.json(buildHealthPayload());
 });
 
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, vision: !!process.env.OPENAI_API_KEY, standalone: true, service: 'cani-ocr' });
+  res.json(buildHealthPayload());
+});
+
+app.get('/api/version', (_req, res) => {
+  res.json(buildHealthPayload());
 });
 
 app.get(['/cani', '/cani/'], caniAuth, (_req, res) => {
