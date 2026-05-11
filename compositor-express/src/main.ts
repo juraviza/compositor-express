@@ -5,8 +5,20 @@ import type { Request, Response, NextFunction } from 'express';
 import { AppModule } from './app.module';
 
 const multer = require('multer');
+const sharp = require('sharp');
+const Tesseract = require('tesseract.js');
+const fs = require('fs');
+const path = require('path');
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 12 * 1024 * 1024 } });
 const MAX_READ_ORDER_IMAGES = 24;
+const tessdataRootCandidates = [
+  path.resolve(__dirname, '..'),
+  path.resolve(process.cwd()),
+  path.resolve(process.cwd(), 'compositor-express'),
+];
+const tessdataRoot = tessdataRootCandidates.find((candidate: string) => (
+  fs.existsSync(path.join(candidate, 'spa.traineddata')) && fs.existsSync(path.join(candidate, 'eng.traineddata'))
+));
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -54,28 +66,48 @@ async function bootstrap() {
         return res.status(400).json({ ok: false, message: 'No se ha recibido ninguna imagen.' });
       }
 
-      const content = [
-        {
-          type: 'input_text',
-          text: 'Lee estas fotos de un pedido manuscrito de bebidas. A veces recibirás dos versiones de la misma hoja: una foto original y otra pasada por modo escáner. Úsalas como ayuda visual, pero NO dupliques líneas si ves la misma hoja dos veces. MUY IMPORTANTE: estas hojas suelen tener productos escritos en la columna izquierda y cantidades o formatos en la columna derecha, emparejados por filas. Debes relacionar cada producto con la cantidad de su misma altura aunque haya flechas o la hoja esté inclinada. Devuelve SOLO JSON válido con esta forma exacta: {"lines":["2 coca cola","1 larios"],"notes":["texto dudoso si hace falta"],"uncertainLines":["línea que no se entiende bien"]}. Reglas: 1) una línea por producto, 2) intenta corregir nombres evidentes de bebidas, 3) si la cantidad no está clara, asume 1 y añádelo en notes, 4) interpreta correctamente formatos como "Beefeater 1 caja", "Beefeater ---- 1 caja", "Beefeater 1 und", "Larios 1 ud", "Brugal 1 unidad" y devuelve siempre la cantidad al principio, 5) cuando aparezca UND, UD o UNIDAD significa unidad, 6) cuando aparezca CAJA o CAJAS significa caja, 7) no uses la x como formato de cantidad porque este cliente no la usa así, 8) si una línea no se entiende bien o dudas del texto, añádela también en uncertainLines para que quede marcada, 9) junta todas las fotos en un solo pedido, 10) si puedes leer al menos parte de la hoja, devuelve esas líneas útiles aunque no estén todas perfectas, 11) ejemplo válido de salida: ["1 beefeater caja","2 larios unidad","10 coca cola caja","4 barriles"], 12) no expliques nada fuera del JSON.',
-        },
-        ...usableFiles.map((file) => ({
-          type: 'input_image',
-          image_url: `data:${file.mimetype || 'image/jpeg'};base64,${file.buffer.toString('base64')}`,
-        })),
-      ];
+      const ocrHints = await extractOrderOcrHints(usableFiles);
+      const imageContent = usableFiles.map((file) => ({
+        type: 'input_image',
+        image_url: `data:${file.mimetype || 'image/jpeg'};base64,${file.buffer.toString('base64')}`,
+      }));
 
-      let parsed = await readOrderWithOpenAI(process.env.OPENAI_API_KEY, content);
-      const firstLines = Array.isArray(parsed.lines) ? parsed.lines.filter(Boolean) : [];
+      const plainText = await transcribeOrderAsLines(process.env.OPENAI_API_KEY, imageContent, ocrHints);
+      let parsed: { lines: string[]; notes: string[]; uncertainLines: string[]; raw: string } = {
+        lines: extractUsefulLinesFromRawText(plainText),
+        notes: [],
+        uncertainLines: [],
+        raw: plainText,
+      };
 
-      if (!firstLines.length) {
-        parsed = await readOrderWithOpenAI(process.env.OPENAI_API_KEY, [
-          {
-            type: 'input_text',
-            text: 'Reintenta la lectura del pedido manuscrito. Piensa en una lista con productos a la izquierda y cantidades a la derecha, emparejadas por filas. Prioriza sacar líneas útiles aunque sean aproximadas. No devuelvas lines vacío si puedes leer aunque sea parte de la hoja. Si dudas, usa uncertainLines. Devuelve solo JSON válido.',
-          },
-          ...content,
-        ]);
+      if (!parsed.lines.length && ocrHints) {
+        const hintLines = extractUsefulLinesFromRawText(ocrHints);
+        if (hintLines.length) {
+          parsed = {
+            lines: hintLines,
+            notes: ['Lectura recuperada desde OCR dedicado previo. Revísala.'],
+            uncertainLines: hintLines,
+            raw: ocrHints,
+          };
+        } else {
+          const textOnlyRecovery = await recoverOrderFromOcrHints(process.env.OPENAI_API_KEY, ocrHints);
+          const recoveredLines = extractUsefulLinesFromRawText(textOnlyRecovery);
+          if (recoveredLines.length) {
+            parsed = {
+              lines: recoveredLines,
+              notes: ['Lectura recuperada a partir del OCR dedicado previo. Revísala.'],
+              uncertainLines: recoveredLines,
+              raw: textOnlyRecovery,
+            };
+          } else {
+            parsed = {
+              lines: [],
+              notes: ['El OCR dedicado sacó texto parcial, pero no pude estructurarlo bien.'],
+              uncertainLines: [],
+              raw: ocrHints,
+            };
+          }
+        }
       }
 
       const lines = Array.isArray(parsed.lines) ? parsed.lines.map((x: unknown) => String(x).trim()).filter(Boolean) : [];
@@ -111,7 +143,72 @@ async function bootstrap() {
   new Logger('Bootstrap').log(`🎸 Flamenquito Fusión API running on port ${port}`);
 }
 
-async function readOrderWithOpenAI(apiKey: string, content: any[]) {
+async function extractOrderOcrHints(files: Array<{ buffer: Buffer }>) {
+  const chunks: string[] = [];
+  for (const file of files.slice(0, MAX_READ_ORDER_IMAGES)) {
+    try {
+      const processed = await preprocessForDedicatedOcr(file.buffer);
+      const text = await runDedicatedOcr(processed);
+      const cleaned = normalizeOcrText(text);
+      if (cleaned) chunks.push(cleaned);
+    } catch (error: any) {
+      console.error('Dedicated OCR failed for one image:', error?.message || error);
+    }
+  }
+  return chunks.join('\n\n--- OCR IMAGE ---\n\n').trim();
+}
+
+async function preprocessForDedicatedOcr(buffer: Buffer) {
+  return sharp(buffer)
+    .rotate()
+    .grayscale()
+    .normalize()
+    .linear(1.4, -12)
+    .sharpen()
+    .png()
+    .toBuffer();
+}
+
+async function runDedicatedOcr(buffer: Buffer) {
+  const options: Record<string, unknown> = { logger: () => {} };
+  if (tessdataRoot) {
+    options.langPath = `file://${tessdataRoot}`;
+    options.gzip = false;
+  }
+  const result = await Tesseract.recognize(buffer, 'spa+eng', options);
+  return String(result?.data?.text || '').trim();
+}
+
+function normalizeOcrText(text: string) {
+  return String(text || '')
+    .replace(/[|]/g, '1')
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/\r/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+async function transcribeOrderAsLines(apiKey: string, imageContent: any[], ocrHints: string) {
+  return callOpenAIText(apiKey, [
+    {
+      type: 'input_text',
+      text: `Lee estas fotos de un pedido manuscrito de bebidas y devuelve SOLO texto plano, una línea final de pedido por fila. No devuelvas JSON ni explicaciones. Reglas: 1) si hay varias versiones o recortes de la misma hoja, úsalos como apoyo pero no dupliques líneas, 2) los productos suelen ir a la izquierda y las cantidades o formatos a la derecha, 3) si recibes recortes de la mitad izquierda o derecha de la hoja, úsalos para alinear mejor cada fila entre producto y cantidad, 4) devuelve la cantidad al principio cuando puedas, 5) si la cantidad no está clara usa 1, 6) piensa fila por fila, 7) corrige nombres evidentes de bebidas, 8) si ves "bot.", "ud", "uds", "caja", "cajas", "barriles", "tercios" o similar, consérvalo al final de la línea, 9) ejemplos válidos: "2 cerveza barril jarras", "1 bot machaquito dulce", "3 tercios", "10 lata atun", "1 caja beefeater", "2 ud larios", "3 botellas vino tinto rioja", "2 cajas castellana". 10) si una línea está tachada, ignórala.${ocrHints ? `\n\nPISTAS OCR PREVIAS:\n${ocrHints}` : ''}`,
+    },
+    ...imageContent,
+  ]);
+}
+
+async function recoverOrderFromOcrHints(apiKey: string, ocrHints: string) {
+  return callOpenAIText(apiKey, [
+    {
+      type: 'input_text',
+      text: `A partir de este texto OCR imperfecto de una hoja de pedido manuscrita, reconstruye una lista simple de pedido. Devuelve solo líneas de pedido, una por línea, con la cantidad al principio cuando se pueda inferir. Si una cantidad no está clara, usa 1. No devuelvas JSON ni explicaciones.\n\nTEXTO OCR:\n${ocrHints}`,
+    },
+  ]);
+}
+
+async function callOpenAIText(apiKey: string, content: any[]) {
   const response = await fetch('https://api.openai.com/v1/responses', {
     method: 'POST',
     headers: {
@@ -119,36 +216,28 @@ async function readOrderWithOpenAI(apiKey: string, content: any[]) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-4.1-mini',
+      model: 'gpt-4.1',
       input: [{ role: 'user', content }],
     }),
   });
 
   const json = await response.json();
-  if (!response.ok) {
-    throw new Error(json?.error?.message || 'OpenAI error');
-  }
-
-  const text = String(json?.output_text || '').trim();
-  const cleaned = text.replace(/^```json\s*/i, '').replace(/^```/i, '').replace(/```$/i, '').trim();
-  const parsed = safeParseOrderJson(cleaned);
-  return { ...parsed, raw: cleaned };
+  if (!response.ok) throw new Error(json?.error?.message || 'OpenAI error');
+  return String(json?.output_text || '').trim();
 }
 
-function safeParseOrderJson(text: string) {
-  try {
-    return JSON.parse(text);
-  } catch {
-    const match = text.match(/\{[\s\S]*\}/);
-    if (!match) {
-      return { lines: [], notes: ['La IA no pudo devolver una lectura limpia.'], uncertainLines: ['Foto difícil de interpretar'] };
-    }
-    try {
-      return JSON.parse(match[0]);
-    } catch {
-      return { lines: [], notes: ['La IA devolvió una lectura incompleta.'], uncertainLines: ['Foto difícil de interpretar'] };
-    }
-  }
+function extractUsefulLinesFromRawText(text: string) {
+  return String(text || '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .map((line) => line.replace(/^[-*•\d.)\s]+/, '').trim())
+    .filter(Boolean)
+    .filter((line) => !/^```/.test(line))
+    .filter((line) => !/^(json|lines|notes|uncertainLines)\b[:\s]*$/i.test(line))
+    .filter((line) => !/^[\[{()}\],]+$/.test(line))
+    .filter((line) => /[a-záéíóúñü]/i.test(line))
+    .filter((line) => line.length >= 3)
+    .slice(0, 40);
 }
 
 bootstrap();
