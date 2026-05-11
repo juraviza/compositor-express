@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>APP MOZART WEB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div>
+          <div class="brand">
+            <div class="brand-mark">M</div>
+            <div>
+              <div class="brand-title">APP MOZART WEB</div>
+              <div class="brand-subtitle">Estudio creativo</div>
+            </div>
+          </div>
+
+          <nav class="nav">
+            <button class="nav-item active" data-view="home">Inicio</button>
+            <button class="nav-item" data-view="song">Nueva canción</button>
+            <button class="nav-item" data-view="studio">Estudio creativo</button>
+            <button class="nav-item" data-view="rewrite">Reescribir</button>
+            <button class="nav-item" data-view="library">Biblioteca</button>
+          </nav>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="mini-card">
+            <div class="mini-label">Modo actual</div>
+            <div class="mini-title">Productor IA</div>
+            <div class="mini-text">Dirección musical premium, rápida e intuitiva.</div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <div class="eyebrow">APP MOZART WEB</div>
+            <h1 id="pageTitle">Inicio del estudio</h1>
+          </div>
+          <div class="top-actions">
+            <button class="ghost-btn">Guardar</button>
+            <button class="primary-btn">Nueva versión</button>
+          </div>
+        </header>
+
+        <section id="view-home" class="view active">
+          <div class="hero card glow">
+            <div class="hero-copy">
+              <span class="badge">Estudio premium de composición</span>
+              <h2>Escribe canciones con alma, estilo y dirección real</h2>
+              <p>Tu estudio creativo para generar, reescribir y pulir letras en distintos estilos musicales, sin parecer un chat frío ni una herramienta técnica aburrida.</p>
+              <div class="hero-actions">
+                <button class="primary-btn" data-jump="studio">Entrar al estudio</button>
+                <button class="ghost-btn" data-jump="song">Empezar canción</button>
+              </div>
+            </div>
+            <div class="hero-panel card soft-panel">
+              <div class="panel-title">Accesos rápidos</div>
+              <div class="quick-grid">
+                <button class="quick-card">Canción completa</button>
+                <button class="quick-card">Estribillo</button>
+                <button class="quick-card">Verso</button>
+                <button class="quick-card">Reescribir letra</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid two-col">
+            <div class="card">
+              <div class="section-head">
+                <h3>Estilos del estudio</h3>
+                <span>Selecciona el color musical</span>
+              </div>
+              <div class="chip-grid">
+                <span class="chip active">Pop</span>
+                <span class="chip">Reggaetón</span>
+                <span class="chip">Flamenco pop</span>
+                <span class="chip">Trap</span>
+                <span class="chip">Bachata</span>
+                <span class="chip">Balada</span>
+                <span class="chip">Afrobeats</span>
+                <span class="chip">Urbano melódico</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="section-head">
+                <h3>Proyectos recientes</h3>
+                <span>Lo último del estudio</span>
+              </div>
+              <div class="project-list">
+                <div class="project-card">
+                  <strong>Luna en la avenida</strong>
+                  <span>Pop romántico · 2 versiones</span>
+                </div>
+                <div class="project-card">
+                  <strong>Mucho más que ruido</strong>
+                  <span>Flamenco pop · Estribillo cerrado</span>
+                </div>
+                <div class="project-card">
+                  <strong>Te quise tarde</strong>
+                  <span>Urbano melódico · Reescritura</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-song" class="view">
+          <div class="card form-card">
+            <div class="section-head">
+              <h3>Nueva canción</h3>
+              <span>Arranca en menos de un minuto</span>
+            </div>
+            <label class="field">
+              <span>¿Qué quieres contar hoy?</span>
+              <textarea rows="4" placeholder="Un amor que vuelve tarde, pero vuelve con fuego..."></textarea>
+            </label>
+            <div class="form-grid">
+              <div>
+                <div class="label">Estilo</div>
+                <div class="chip-grid compact">
+                  <span class="chip active">Pop</span>
+                  <span class="chip">Reggaetón</span>
+                  <span class="chip">Trap</span>
+                  <span class="chip">Flamenco pop</span>
+                </div>
+              </div>
+              <div>
+                <div class="label">Emoción</div>
+                <div class="chip-grid compact">
+                  <span class="chip active">Romántica</span>
+                  <span class="chip">Triste</span>
+                  <span class="chip">Sensual</span>
+                  <span class="chip">Calle</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-grid">
+              <label class="field">
+                <span>Referencia artística</span>
+                <input type="text" placeholder="Ketama, C. Tangana, Alejandro Sanz..." />
+              </label>
+              <label class="field">
+                <span>Tipo de resultado</span>
+                <select>
+                  <option>Canción completa</option>
+                  <option>Estribillo</option>
+                  <option>Verso</option>
+                  <option>Reescritura</option>
+                </select>
+              </label>
+            </div>
+            <div class="slider-row">
+              <span>Más poética</span>
+              <input type="range" min="0" max="100" value="66" />
+              <span>Más comercial</span>
+            </div>
+            <div class="end-actions">
+              <button class="primary-btn" data-jump="studio">Entrar al estudio</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-studio" class="view">
+          <div class="studio-layout">
+            <section class="card studio-panel">
+              <div class="section-head">
+                <h3>Producción</h3>
+                <span>Mesa creativa</span>
+              </div>
+              <div class="stack-fields">
+                <label class="field"><span>Estilo</span><input value="Flamenco pop elegante" /></label>
+                <label class="field"><span>Emoción</span><input value="Romántica intensa" /></label>
+                <label class="field"><span>Referencia</span><input value="Ketama + sensibilidad moderna" /></label>
+                <label class="field"><span>Energía</span><input value="Media / creciente" /></label>
+                <label class="field"><span>Estructura</span><input value="Verso · Pre · Estribillo · Verso · Estribillo" /></label>
+              </div>
+              <div class="panel-actions">
+                <button class="primary-btn full">Regenerar canción</button>
+                <button class="ghost-btn full">Regenerar sección</button>
+              </div>
+            </section>
+
+            <section class="card lyrics-panel">
+              <div class="section-head">
+                <h3>Letra</h3>
+                <span>Cuaderno principal</span>
+              </div>
+              <div class="lyrics-editor" contenteditable="true">
+                <h4>Título, Luna en la avenida</h4>
+                <p><strong>Verso 1</strong><br>Te vi pasar con la noche prendida,<br>yo con el pecho pidiendo verdad,<br>tú con la luz desordenando esquinas,<br>yo con las ganas de no mirar atrás.</p>
+                <p><strong>Pre-estribillo</strong><br>Y si me rozas la herida canta,<br>y si me nombras me vuelvo mar.</p>
+                <p><strong>Estribillo</strong><br>Quédate un poco más,<br>que esta ciudad contigo suena mejor,<br>quédate un poco más,<br>que hasta la pena se viste de amor.</p>
+              </div>
+              <div class="lyrics-toolbar">
+                <button class="ghost-btn">Vista estructura</button>
+                <button class="ghost-btn">Comparar versiones</button>
+                <button class="ghost-btn">Historial</button>
+              </div>
+            </section>
+
+            <section class="card assistant-panel">
+              <div class="section-head">
+                <h3>Asistente Mozart</h3>
+                <span>Coproductor IA</span>
+              </div>
+              <div class="assistant-actions">
+                <button class="action-btn">Dame 5 títulos</button>
+                <button class="action-btn">Hazlo más pegadizo</button>
+                <button class="action-btn">Más poesía</button>
+                <button class="action-btn">Más calle</button>
+                <button class="action-btn">Mejora rimas</button>
+                <button class="action-btn">Cambia estribillo</button>
+                <button class="action-btn">Otra versión</button>
+                <button class="action-btn">Crea adlibs</button>
+              </div>
+              <label class="field notes-box">
+                <span>Notas del productor</span>
+                <textarea rows="8" placeholder="Más tensión en el pre, menos cursi en la segunda mitad..."></textarea>
+              </label>
+            </section>
+          </div>
+        </section>
+
+        <section id="view-rewrite" class="view">
+          <div class="card form-card">
+            <div class="section-head">
+              <h3>Reescribir letra</h3>
+              <span>Mejora sin perder el alma</span>
+            </div>
+            <label class="field">
+              <span>Pega aquí tu letra</span>
+              <textarea rows="10" placeholder="Pega tu letra y te la devuelvo más fuerte, más fina o más comercial..."></textarea>
+            </label>
+            <div class="chip-grid compact">
+              <span class="chip active">Más comercial</span>
+              <span class="chip">Más poética</span>
+              <span class="chip">Más calle</span>
+              <span class="chip">Más fina</span>
+              <span class="chip">Mejor rima</span>
+            </div>
+            <div class="end-actions">
+              <button class="primary-btn">Reescribir</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-library" class="view">
+          <div class="card">
+            <div class="section-head">
+              <h3>Biblioteca</h3>
+              <span>Proyectos, ideas y versiones</span>
+            </div>
+            <div class="library-grid">
+              <div class="project-card tall"><strong>Carpeta Pop</strong><span>12 proyectos</span></div>
+              <div class="project-card tall"><strong>Flamenco pop</strong><span>7 proyectos</span></div>
+              <div class="project-card tall"><strong>Estribillos favoritos</strong><span>31 ideas</span></div>
+              <div class="project-card tall"><strong>Títulos guardados</strong><span>18 conceptos</span></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
