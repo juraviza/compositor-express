@@ -5,10 +5,17 @@ import type { Request, Response, NextFunction } from 'express';
 import { AppModule } from './app.module';
 
 const multer = require('multer');
-const sharp = require('sharp');
-const Tesseract = require('tesseract.js');
 const fs = require('fs');
 const path = require('path');
+
+let sharp: any = null;
+let Tesseract: any = null;
+try {
+  sharp = require('sharp');
+} catch {}
+try {
+  Tesseract = require('tesseract.js');
+} catch {}
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 12 * 1024 * 1024 } });
 const MAX_READ_ORDER_IMAGES = 24;
 const tessdataRootCandidates = [
@@ -144,6 +151,8 @@ async function bootstrap() {
 }
 
 async function extractOrderOcrHints(files: Array<{ buffer: Buffer }>) {
+  if (!sharp || !Tesseract) return '';
+
   const chunks: string[] = [];
   for (const file of files.slice(0, MAX_READ_ORDER_IMAGES)) {
     try {
