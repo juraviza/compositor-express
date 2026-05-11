@@ -1,275 +1,238 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>APP MOZART WEB</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <div class="shell">
-      <aside class="sidebar">
-        <div>
-          <div class="brand">
-            <div class="brand-mark">M</div>
-            <div>
-              <div class="brand-title">APP MOZART WEB</div>
-              <div class="brand-subtitle">Estudio creativo</div>
-            </div>
-          </div>
-
-          <nav class="nav">
-            <button class="nav-item active" data-view="home">Inicio</button>
-            <button class="nav-item" data-view="song">Nueva canción</button>
-            <button class="nav-item" data-view="studio">Estudio creativo</button>
-            <button class="nav-item" data-view="rewrite">Reescribir</button>
-            <button class="nav-item" data-view="library">Biblioteca</button>
-          </nav>
-        </div>
-
-        <div class="sidebar-footer">
-          <div class="mini-card">
-            <div class="mini-label">Modo actual</div>
-            <div class="mini-title">Productor IA</div>
-            <div class="mini-text">Dirección musical premium, rápida e intuitiva.</div>
-          </div>
-        </div>
-      </aside>
-
-      <main class="main">
-        <header class="topbar">
-          <div>
-            <div class="eyebrow">APP MOZART WEB</div>
-            <h1 id="pageTitle">Inicio del estudio</h1>
-          </div>
-          <div class="top-actions">
-            <button class="ghost-btn">Guardar</button>
-            <button class="primary-btn">Nueva versión</button>
-          </div>
-        </header>
-
-        <section id="view-home" class="view active">
-          <div class="hero card glow">
-            <div class="hero-copy">
-              <span class="badge">Estudio premium de composición</span>
-              <h2>Escribe canciones con alma, estilo y dirección real</h2>
-              <p>Tu estudio creativo para generar, reescribir y pulir letras en distintos estilos musicales, sin parecer un chat frío ni una herramienta técnica aburrida.</p>
-              <div class="hero-actions">
-                <button class="primary-btn" data-jump="studio">Entrar al estudio</button>
-                <button class="ghost-btn" data-jump="song">Empezar canción</button>
-              </div>
-            </div>
-            <div class="hero-panel card soft-panel">
-              <div class="panel-title">Accesos rápidos</div>
-              <div class="quick-grid">
-                <button class="quick-card">Canción completa</button>
-                <button class="quick-card">Estribillo</button>
-                <button class="quick-card">Verso</button>
-                <button class="quick-card">Reescribir letra</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="grid two-col">
-            <div class="card">
-              <div class="section-head">
-                <h3>Estilos del estudio</h3>
-                <span>Selecciona el color musical</span>
-              </div>
-              <div class="chip-grid">
-                <span class="chip active">Pop</span>
-                <span class="chip">Reggaetón</span>
-                <span class="chip">Flamenco pop</span>
-                <span class="chip">Trap</span>
-                <span class="chip">Bachata</span>
-                <span class="chip">Balada</span>
-                <span class="chip">Afrobeats</span>
-                <span class="chip">Urbano melódico</span>
-              </div>
-            </div>
-            <div class="card">
-              <div class="section-head">
-                <h3>Proyectos recientes</h3>
-                <span>Lo último del estudio</span>
-              </div>
-              <div class="project-list">
-                <div class="project-card">
-                  <strong>Luna en la avenida</strong>
-                  <span>Pop romántico · 2 versiones</span>
-                </div>
-                <div class="project-card">
-                  <strong>Mucho más que ruido</strong>
-                  <span>Flamenco pop · Estribillo cerrado</span>
-                </div>
-                <div class="project-card">
-                  <strong>Te quise tarde</strong>
-                  <span>Urbano melódico · Reescritura</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="view-song" class="view">
-          <div class="card form-card">
-            <div class="section-head">
-              <h3>Nueva canción</h3>
-              <span>Arranca en menos de un minuto</span>
-            </div>
-            <label class="field">
-              <span>¿Qué quieres contar hoy?</span>
-              <textarea rows="4" placeholder="Un amor que vuelve tarde, pero vuelve con fuego..."></textarea>
-            </label>
-            <div class="form-grid">
-              <div>
-                <div class="label">Estilo</div>
-                <div class="chip-grid compact">
-                  <span class="chip active">Pop</span>
-                  <span class="chip">Reggaetón</span>
-                  <span class="chip">Trap</span>
-                  <span class="chip">Flamenco pop</span>
-                </div>
-              </div>
-              <div>
-                <div class="label">Emoción</div>
-                <div class="chip-grid compact">
-                  <span class="chip active">Romántica</span>
-                  <span class="chip">Triste</span>
-                  <span class="chip">Sensual</span>
-                  <span class="chip">Calle</span>
-                </div>
-              </div>
-            </div>
-            <div class="form-grid">
-              <label class="field">
-                <span>Referencia artística</span>
-                <input type="text" placeholder="Ketama, C. Tangana, Alejandro Sanz..." />
-              </label>
-              <label class="field">
-                <span>Tipo de resultado</span>
-                <select>
-                  <option>Canción completa</option>
-                  <option>Estribillo</option>
-                  <option>Verso</option>
-                  <option>Reescritura</option>
-                </select>
-              </label>
-            </div>
-            <div class="slider-row">
-              <span>Más poética</span>
-              <input type="range" min="0" max="100" value="66" />
-              <span>Más comercial</span>
-            </div>
-            <div class="end-actions">
-              <button class="primary-btn" data-jump="studio">Entrar al estudio</button>
-            </div>
-          </div>
-        </section>
-
-        <section id="view-studio" class="view">
-          <div class="studio-layout">
-            <section class="card studio-panel">
-              <div class="section-head">
-                <h3>Producción</h3>
-                <span>Mesa creativa</span>
-              </div>
-              <div class="stack-fields">
-                <label class="field"><span>Estilo</span><input value="Flamenco pop elegante" /></label>
-                <label class="field"><span>Emoción</span><input value="Romántica intensa" /></label>
-                <label class="field"><span>Referencia</span><input value="Ketama + sensibilidad moderna" /></label>
-                <label class="field"><span>Energía</span><input value="Media / creciente" /></label>
-                <label class="field"><span>Estructura</span><input value="Verso · Pre · Estribillo · Verso · Estribillo" /></label>
-              </div>
-              <div class="panel-actions">
-                <button class="primary-btn full">Regenerar canción</button>
-                <button class="ghost-btn full">Regenerar sección</button>
-              </div>
-            </section>
-
-            <section class="card lyrics-panel">
-              <div class="section-head">
-                <h3>Letra</h3>
-                <span>Cuaderno principal</span>
-              </div>
-              <div class="lyrics-editor" contenteditable="true">
-                <h4>Título, Luna en la avenida</h4>
-                <p><strong>Verso 1</strong><br>Te vi pasar con la noche prendida,<br>yo con el pecho pidiendo verdad,<br>tú con la luz desordenando esquinas,<br>yo con las ganas de no mirar atrás.</p>
-                <p><strong>Pre-estribillo</strong><br>Y si me rozas la herida canta,<br>y si me nombras me vuelvo mar.</p>
-                <p><strong>Estribillo</strong><br>Quédate un poco más,<br>que esta ciudad contigo suena mejor,<br>quédate un poco más,<br>que hasta la pena se viste de amor.</p>
-              </div>
-              <div class="lyrics-toolbar">
-                <button class="ghost-btn">Vista estructura</button>
-                <button class="ghost-btn">Comparar versiones</button>
-                <button class="ghost-btn">Historial</button>
-              </div>
-            </section>
-
-            <section class="card assistant-panel">
-              <div class="section-head">
-                <h3>Asistente Mozart</h3>
-                <span>Coproductor IA</span>
-              </div>
-              <div class="assistant-actions">
-                <button class="action-btn">Dame 5 títulos</button>
-                <button class="action-btn">Hazlo más pegadizo</button>
-                <button class="action-btn">Más poesía</button>
-                <button class="action-btn">Más calle</button>
-                <button class="action-btn">Mejora rimas</button>
-                <button class="action-btn">Cambia estribillo</button>
-                <button class="action-btn">Otra versión</button>
-                <button class="action-btn">Crea adlibs</button>
-              </div>
-              <label class="field notes-box">
-                <span>Notas del productor</span>
-                <textarea rows="8" placeholder="Más tensión en el pre, menos cursi en la segunda mitad..."></textarea>
-              </label>
-            </section>
-          </div>
-        </section>
-
-        <section id="view-rewrite" class="view">
-          <div class="card form-card">
-            <div class="section-head">
-              <h3>Reescribir letra</h3>
-              <span>Mejora sin perder el alma</span>
-            </div>
-            <label class="field">
-              <span>Pega aquí tu letra</span>
-              <textarea rows="10" placeholder="Pega tu letra y te la devuelvo más fuerte, más fina o más comercial..."></textarea>
-            </label>
-            <div class="chip-grid compact">
-              <span class="chip active">Más comercial</span>
-              <span class="chip">Más poética</span>
-              <span class="chip">Más calle</span>
-              <span class="chip">Más fina</span>
-              <span class="chip">Mejor rima</span>
-            </div>
-            <div class="end-actions">
-              <button class="primary-btn">Reescribir</button>
-            </div>
-          </div>
-        </section>
-
-        <section id="view-library" class="view">
-          <div class="card">
-            <div class="section-head">
-              <h3>Biblioteca</h3>
-              <span>Proyectos, ideas y versiones</span>
-            </div>
-            <div class="library-grid">
-              <div class="project-card tall"><strong>Carpeta Pop</strong><span>12 proyectos</span></div>
-              <div class="project-card tall"><strong>Flamenco pop</strong><span>7 proyectos</span></div>
-              <div class="project-card tall"><strong>Estribillos favoritos</strong><span>31 ideas</span></div>
-              <div class="project-card tall"><strong>Títulos guardados</strong><span>18 conceptos</span></div>
-            </div>
-          </div>
-        </section>
-      </main>
-    </div>
-
-    <script src="./app.js"></script>
-  </body>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>APP MOZART WEB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#09090d;--p:rgba(24,24,31,.88);--p2:rgba(18,18,24,.92);--b:rgba(255,255,255,.08);--t:#f4f4f7;--m:#a6a7b3);--pr:#d63c8a;--s:#5b7cff;--g:#d8b46b;--sh:0 18px 60px rgba(0,0,0,.38)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:Inter,system-ui,sans-serif;color:var(--t);background:radial-gradient(circle at 68% 0%,rgba(214,60,138,.18),transparent 48%),radial-gradient(circle at 92% 6%,rgba(91,124,255,.14),transparent 46%),linear-gradient(195deg,#101018 0%,var(--bg) 100%)}
+.shell{display:grid;grid-template-columns:264px 1fr;min-height:100vh}
+.sb{display:flex;flex-direction:column;justify-content:space-between;padding:26px 18px;border-right:1px solid var(--b);background:rgba(8,8,12,.86);backdrop-filter:blur(14px)}
+.brand{display:flex;gap:12px;align-items:center;margin-bottom:30px}
+.bm{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--pr),var(--s));font-weight:800;font-size:1.2rem;box-shadow:0 10px 30px rgba(91,124,255,.25)}
+.bt{font-size:.92rem;font-weight:800}
+.bs{color:var(--m);font-size:.82rem}
+.nav{display:grid;gap:8px}
+.ni{border:1px solid transparent;color:var(--t);background:transparent;text-align:left;padding:13px 14px;border-radius:12px;cursor:pointer;font-size:.93rem}
+.ni.active,.ni:hover{background:rgba(255,255,255,.05);border-color:var(--b)}
+.mc,.cd{padding:18px;border:1px solid var(--b);background:var(--p);backdrop-filter:blur(14px);border-radius:22px;box-shadow:var(--sh)}
+.ml{color:var(--g);font-size:.74rem;text-transform:uppercase;letter-spacing:.08em}
+.mt{font-weight:700;margin-top:7px}
+.mt2{color:var(--m);font-size:.88rem;margin-top:5px;line-height:1.45}
+.mn{padding:28px;display:grid;gap:22px}
+.tb{display:flex;justify-content:space-between;align-items:center;gap:20px}
+.ey{color:var(--g);font-size:.74rem;text-transform:uppercase;letter-spacing:.1em}
+.tb h1{margin:6px 0 0;font-size:1.9rem}
+.ta{display:flex;gap:12px}
+.v{display:none;gap:22px}
+.v.active{display:grid}
+.cd{padding:24px}
+.glow{box-shadow:0 20px 80px rgba(214,60,138,.12),0 18px 60px rgba(0,0,0,.4)}
+.sp{background:var(--p2)}
+.hr{display:grid;grid-template-columns:1.5fr 1fr;gap:22px;align-items:stretch}
+.hc h2{font-size:2.8rem;line-height:1.02;margin:13px 0;max-width:760px}
+.hc p{color:var(--m);max-width:720px;line-height:1.6;font-size:1rem}
+.ba{display:inline-flex;padding:7px 12px;border-radius:999px;font-size:.78rem;background:rgba(214,60,138,.12);border:1px solid rgba(214,60,138,.26)}
+.ha,.ea{display:flex;gap:12px;margin-top:22px}
+.pp{padding:20px}
+.pt{font-weight:700;margin-bottom:15px}
+.qg{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.qc{padding:17px;border-radius:16px;border:1px solid var(--b);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));color:var(--t);text-align:left;cursor:pointer}
+.gc{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.sh{display:flex;justify-content:space-between;gap:18px;align-items:baseline;margin-bottom:18px}
+.sh h3{margin:0;font-size:1.15rem}
+.sh span{color:var(--m);font-size:.9rem}
+.cg{display:flex;flex-wrap:wrap;gap:9px}
+.ch{display:inline-flex;align-items:center;justify-content:center;padding:10px 13px;border-radius:999px;border:1px solid var(--b);color:var(--t);background:rgba(255,255,255,.03);font-size:.9rem}
+.ch.a{background:linear-gradient(135deg,rgba(214,60,138,.24),rgba(91,124,255,.24));border-color:rgba(255,255,255,.14)}
+.pl{display:grid;gap:11px}
+.pc{display:grid;gap:4px;padding:15px;border-radius:16px;border:1px solid var(--b);background:rgba(255,255,255,.035)}
+.pc span{color:var(--m);font-size:.9rem}
+.fc{max-width:1060px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.fl{display:grid;gap:7px;margin-bottom:18px}
+.fl span,.lb{color:var(--m);font-size:.9rem}
+input,textarea,select{width:100%;color:var(--t);border-radius:14px;border:1px solid var(--b);background:rgba(255,255,255,.03);padding:14px 15px;outline:none;font:inherit}
+textarea{resize:vertical}
+.sr{display:grid;grid-template-columns:auto 1fr auto;gap:11px;align-items:center;color:var(--m)}
+.sl{grid-template-columns:1fr 1fr 1fr;gap:18px}
+.ap{display:grid;grid-template-columns:294px 1fr 294px;gap:18px;align-items:start}
+.ap>section{position:sticky;top:20px}
+.sf{display:grid;gap:9px}
+.pa{display:grid;gap:9px;margin-top:15px}
+.w{width:100%;justify-content:center}
+.le{min-height:540px;padding:21px;border-radius:18px;border:1px solid var(--b);background:rgba(255,255,255,.025);line-height:1.75;color:#f3f0f7}
+.le h4{margin-top:0;font-size:1.18rem}
+.lt{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}
+.ab{display:grid;gap:9px;margin-bottom:15px}
+.abtn,.gb,.pb{border-radius:14px;padding:12px 15px;font:inherit;cursor:pointer}
+.abtn,.gb{background:rgba(255,255,255,.03);color:var(--t);border:1px solid var(--b);text-align:left}
+.pb{border:1px solid transparent;color:white;background:linear-gradient(135deg,var(--pr),var(--s));box-shadow:0 14px 34px rgba(91,124,255,.25)}
+.nb textarea{min-height:165px}
+@media(max-width:1180px){.shell{grid-template-columns:1fr}.sb{position:sticky;top:0;z-index:20;border-right:0;border-bottom:1px solid var(--b);padding:16px}.nav{grid-template-columns:repeat(5,minmax(0,1fr));overflow:auto}.ni{text-align:center;white-space:nowrap}.hr,.gc,.fg,.ap{grid-template-columns:1fr}.ap>section{position:static}}
+@media(max-width:700px){.mn{padding:18px}.tb{flex-direction:column;align-items:flex-start}.hc h2{font-size:2.1rem}.qg{grid-template-columns:1fr}.nav{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sb">
+<div>
+<div class="brand"><div class="bm">M</div><div><div class="bt">APP MOZART WEB</div><div class="bs">Estudio creativo</div></div></div>
+<nav class="nav">
+<button class="ni active" data-v="home">Inicio</button>
+<button class="ni" data-v="song">Nueva canción</button>
+<button class="ni" data-v="studio">Estudio creativo</button>
+<button class="ni" data-v="rewrite">Reescribir</button>
+<button class="ni" data-v="library">Biblioteca</button>
+</nav>
+</div>
+<div class="mc">
+<div class="ml">Modo actual</div>
+<div class="mt">Productor IA</div>
+<div class="mt2">Dirección musical premium, rápida e intuitiva.</div>
+</div>
+</aside>
+<main class="mn">
+<header class="tb">
+<div><div class="ey">APP MOZART WEB</div><h1 id="pt">Inicio del estudio</h1></div>
+<div class="ta">
+<button class="gb">Guardar</button>
+<button class="pb">Nueva versión</button>
+</div>
+</header>
+<div id="v-home" class="v active">
+<div class="cd glow hr">
+<div class="hc">
+<span class="ba">Estudio premium de composición</span>
+<h2>Escribe canciones con alma, estilo y dirección real</h2>
+<p>Tu estudio creativo para generar, reescribir y pulir letras en distintos estilos musicales, sin parecer un chat frío ni una herramienta técnica aburrida.</p>
+<div class="ha">
+<button class="pb" data-j="studio">Entrar al estudio</button>
+<button class="gb" data-j="song">Empezar canción</button>
+</div>
+</div>
+<div class="cd sp pp">
+<div class="pt">Accesos rápidos</div>
+<div class="qg">
+<button class="qc">Canción completa</button>
+<button class="qc">Estribillo</button>
+<button class="qc">Verso</button>
+<button class="qc">Reescribir letra</button>
+</div>
+</div>
+</div>
+<div class="gc">
+<div class="cd">
+<div class="sh"><h3>Estilos del estudio</h3><span>Selecciona el color musical</span></div>
+<div class="cg">
+<span class="ch a">Pop</span><span class="ch">Reggaetón</span><span class="ch">Flamenco pop</span><span class="ch">Trap</span><span class="ch">Bachata</span><span class="ch">Balada</span><span class="ch">Afrobeats</span><span class="ch">Urbano melódico</span>
+</div>
+</div>
+<div class="cd">
+<div class="sh"><h3>Proyectos recientes</h3><span>Lo último del estudio</span></div>
+<div class="pl">
+<div class="pc"><strong>Luna en la avenida</strong><span>Pop romántico · 2 versiones</span></div>
+<div class="pc"><strong>Mucho más que ruido</strong><span>Flamenco pop · Estribillo cerrado</span></div>
+<div class="pc"><strong>Te quise tarde</strong><span>Urbano melódico · Reescritura</span></div>
+</div>
+</div>
+</div>
+</div>
+<div id="v-song" class="v">
+<div class="cd fc">
+<div class="sh"><h3>Nueva canción</h3><span>Arranca en menos de un minuto</span></div>
+<div class="fl"><span>¿Qué quieres contar hoy?</span><textarea rows="4" placeholder="Un amor que vuelve tarde, pero vuelve con fuego..."></textarea></div>
+<div class="fg">
+<div><div class="lb">Estilo</div><div class="cg"><span class="ch a">Pop</span><span class="ch">Reggaetón</span><span class="ch">Trap</span><span class="ch">Flamenco pop</span></div></div>
+<div><div class="lb">Emoción</div><div class="cg"><span class="ch a">Romántica</span><span class="ch">Triste</span><span class="ch">Sensual</span><span class="ch">Calle</span></div></div>
+</div>
+<div class="fg" style="margin-top:18px">
+<div class="fl"><span>Referencia artística</span><input placeholder="Ketama, C. Tangana, Alejandro Sanz..."/></div>
+<div class="fl"><span>Tipo de resultado</span><select><option>Canción completa</option><option>Estribillo</option><option>Verso</option><option>Reescritura</option></select></div>
+</div>
+<div class="sr" style="margin-top:18px"><span>Más poética</span><input type="range" min="0" max="100" value="66"/><span>Más comercial</span></div>
+<div class="ea"><button class="pb" data-j="studio">Entrar al estudio</button></div>
+</div>
+</div>
+<div id="v-studio" class="v">
+<div class="ap">
+<div class="cd sf">
+<div class="sh"><h3>Producción</h3><span>Mesa creativa</span></div>
+<div class="fl"><span>Estilo</span><input value="Flamenco pop elegante"/></div>
+<div class="fl"><span>Emoción</span><input value="Romántica intensa"/></div>
+<div class="fl"><span>Referencia</span><input value="Ketama + sensibilidad moderna"/></div>
+<div class="fl"><span>Energía</span><input value="Media / creciente"/></div>
+<div class="fl"><span>Estructura</span><input value="Verso · Pre · Estribillo · Verso · Estribillo"/></div>
+<div class="pa">
+<button class="pb w">Regenerar canción</button>
+<button class="gb w">Regenerar sección</button>
+</div>
+</div>
+<div class="cd le" contenteditable="true">
+<h4>Título · Luna en la avenida</h4>
+<p><strong>Verso 1</strong><br>Te vi pasar con la noche prendida,<br>yo con el pecho pidiendo verdad,<br>tú con la luz desordenando esquinas,<br>yo con las ganas de no mirar atrás.</p>
+<p><strong>Pre-estribillo</strong><br>Y si me rozas la herida canta,<br>y si me nombras me vuelvo mar.</p>
+<p><strong>Estribillo</strong><br>Quédate un poco más,<br>que esta ciudad contigo suena mejor,<br>quédate un poco más,<br>que hasta la pena se viste de amor.</p>
+</div>
+<div class="cd">
+<div class="sh"><h3>Asistente Mozart</h3><span>Coproductor IA</span></div>
+<div class="ab">
+<button class="abtn">Dame 5 títulos</button>
+<button class="abtn">Hazlo más pegadizo</button>
+<button class="abtn">Más poesía</button>
+<button class="abtn">Más calle</button>
+<button class="abtn">Mejora rimas</button>
+<button class="abtn">Cambia estribillo</button>
+<button class="abtn">Otra versión</button>
+<button class="abtn">Crea adlibs</button>
+</div>
+<div class="fl nb"><span>Notas del productor</span><textarea rows="8" placeholder="Más tensión en el pre, menos cursi en la segunda mitad..."></textarea></div>
+</div>
+</div>
+</div>
+<div id="v-rewrite" class="v">
+<div class="cd fc">
+<div class="sh"><h3>Reescribir letra</h3><span>Mejora sin perder el alma</span></div>
+<div class="fl"><span>Pega aquí tu letra</span><textarea rows="10" placeholder="Pega tu letra y te la devuelvo más fuerte, más fina o más comercial..."></textarea></div>
+<div class="cg" style="margin-top:14px">
+<span class="ch a">Más comercial</span><span class="ch">Más poética</span><span class="ch">Más calle</span><span class="ch">Más fina</span><span class="ch">Mejor rima</span>
+</div>
+<div class="ea"><button class="pb">Reescribir</button></div>
+</div>
+</div>
+<div id="v-library" class="v">
+<div class="cd">
+<div class="sh"><h3>Biblioteca</h3><span>Proyectos, ideas y versiones</span></div>
+<div class="pl" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+<div class="pc" style="min-height:110px;align-content:end"><strong>Carpeta Pop</strong><span>12 proyectos</span></div>
+<div class="pc" style="min-height:110px;align-content:end"><strong>Flamenco pop</strong><span>7 proyectos</span></div>
+<div class="pc" style="min-height:110px;align-content:end"><strong>Estribillos favoritos</strong><span>31 ideas</span></div>
+<div class="pc" style="min-height:110px;align-content:end"><strong>Títulos guardados</strong><span>18 conceptos</span></div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script>
+const vt={home:'Inicio del estudio',song:'Nueva canción',studio:'Estudio creativo',rewrite:'Reescritura inteligente',library:'Biblioteca del estudio'};
+document.querySelectorAll('[data-v]').forEach(b=>b.addEventListener('click',()=>{
+  const v=b.dataset.v;
+  document.querySelectorAll('.v').forEach(x=>x.classList.toggle('active',x.id==='v-'+v));
+  document.querySelectorAll('.ni').forEach(x=>x.classList.toggle('active',x.dataset.v===v));
+  document.getElementById('pt').textContent=vt[v]||'APP MOZART WEB';
+}));
+document.querySelectorAll('[data-j]').forEach(b=>b.addEventListener('click',()=>{
+  const v=b.dataset.j;
+  document.querySelectorAll('.v').forEach(x=>x.classList.toggle('active',x.id==='v-'+v));
+  document.querySelectorAll('.ni').forEach(x=>x.classList.toggle('active',x.dataset.v===v));
+  document.getElementById('pt').textContent=vt[v]||'APP MOZART WEB';
+}));
+document.querySelectorAll('.ch:not(.a)').forEach(c=>c.addEventListener('click',function(){this.parentElement.querySelectorAll('.ch').forEach(x=>x.classList.remove('a'));this.classList.add('a')}));
+</script>
+</body>
 </html>
