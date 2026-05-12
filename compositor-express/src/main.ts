@@ -1,3 +1,5 @@
+import vision from '@google-cloud/vision';
+
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -10,12 +12,11 @@ const path = require('path');
 
 let sharp: any = null;
 let Tesseract: any = null;
-try {
-  sharp = require('sharp');
-} catch {}
-try {
-  Tesseract = require('tesseract.js');
-} catch {}
+try { sharp = require('sharp'); } catch {}
+try { Tesseract = require('tesseract.js'); } catch {}
+
+const visionClient = new vision.ImageAnnotatorClient();
+
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 12 * 1024 * 1024 } });
 const MAX_READ_ORDER_IMAGES = 24;
 const tessdataRootCandidates = [
@@ -151,17 +152,33 @@ async function bootstrap() {
 }
 
 async function extractOrderOcrHints(files: Array<{ buffer: Buffer }>) {
-  if (!sharp || !Tesseract) return '';
+  if (!sharp && !visionClient) return '';
 
   const chunks: string[] = [];
   for (const file of files.slice(0, MAX_READ_ORDER_IMAGES)) {
     try {
-      const processed = await preprocessForDedicatedOcr(file.buffer);
-      const text = await runDedicatedOcr(processed);
+      // Try Tesseract first
+      let text = '';
+      if (sharp && Tesseract) {
+        try {
+          const processed = await preprocessForDedicatedOcr(file.buffer);
+          text = await runDedicatedOcr(processed);
+        } catch {}
+      }
       const cleaned = normalizeOcrText(text);
-      if (cleaned) chunks.push(cleaned);
+      if (cleaned && cleaned.length > 15) {
+        chunks.push(`[TESSERACT]\n${cleaned}`);
+      } else {
+        // Try Google Vision as fallback
+        const gvText = await tryGoogleVisionFallback(file.buffer);
+        if (gvText) {
+          chunks.push(`[GOOGLE_VISION]\n${normalizeOcrText(gvText)}`);
+        } else if (cleaned) {
+          chunks.push(`[TESSERACT]\n${cleaned}`);
+        }
+      }
     } catch (error: any) {
-      console.error('Dedicated OCR failed for one image:', error?.message || error);
+      console.error('OCR failed for one image:', error?.message || error);
     }
   }
   return chunks.join('\n\n--- OCR IMAGE ---\n\n').trim();
@@ -172,8 +189,9 @@ async function preprocessForDedicatedOcr(buffer: Buffer) {
     .rotate()
     .grayscale()
     .normalize()
-    .linear(1.4, -12)
+    .linear(1.6, -20)
     .sharpen()
+    .binarize()
     .png()
     .toBuffer();
 }
@@ -188,11 +206,30 @@ async function runDedicatedOcr(buffer: Buffer) {
   return String(result?.data?.text || '').trim();
 }
 
+async function runGoogleVisionOcr(buffer: Buffer): Promise<string> {
+  const b64 = buffer.toString('base64');
+  const [result] = await visionClient.annotateImage({
+    image: { content: b64 },
+    imageContext: { languageHints: ['es', 'en'] },
+    features: [{ type: 'DOCUMENT_TEXT_DETECTION' }, { type: 'TEXT_DETECTION' }],
+  });
+  return result?.fullTextAnnotation?.text || '';
+}
+
+async function tryGoogleVisionFallback(buffer: Buffer): Promise<string | null> {
+  try {
+    const text = await runGoogleVisionOcr(buffer);
+    return text?.length > 10 ? text : null;
+  } catch {
+    return null;
+  }
+}
+
 function normalizeOcrText(text: string) {
   return String(text || '')
     .replace(/[|]/g, '1')
-    .replace(/[“”]/g, '"')
-    .replace(/[‘’]/g, "'")
+    .replace(/[ ""]/g, '"')
+    .replace(/[ '']/g, "'")
     .replace(/\r/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
