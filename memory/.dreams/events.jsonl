@@ -1,0 +1,1 @@
+{"type":"memory.recall.recorded","timestamp":"2026-05-19T11:55:33.621Z","query":"CANI-APP","resultCount":2,"results":[{"path":"memory/2026-05-13.md","startLine":1,"endLine":30,"score":0.44849271884395125},{"path":"memory/2026-05-13.md","startLine":22,"endLine":35,"score":0.43349611376422925}]}

@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "updatedAt": "2026-05-19T11:55:33.621Z",
+  "entries": {
+    "memory:memory/2026-05-13.md:1:30": {
+      "key": "memory:memory/2026-05-13.md:1:30",
+      "path": "memory/2026-05-13.md",
+      "startLine": 1,
+      "endLine": 30,
+      "source": "memory",
+      "snippet": "## Sesión — 2026-05-13 ### CANI-VISION — Google Vision configurado ✅ - Proyecto Google Cloud: **cani-vision** - Service Account: `cani-vision-590@cani-vision.iam.gserviceaccount.com` - JSON key guardado en: `/data/.openclaw/workspace/.keys/google-vision-cani-vision.json` - API Vision habilitada en Google Cloud ✅ - Variable `GOOGLE_APPLICATION_CREDENTIALS` configurada en Render (compositor-express-1) ✅ - Dependencia `@google-cloud/vision` instalada y desplegada ✅ - Endpoint `/api/vision-health` confirma que vision está activo ✅ ### Cambios de código pendientes de desplegar - **OCR pipeline:** Google Vision ahora es el motor principal (antes Tesseract) - **Prompt mejorado:** ejemplos de corr",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.44849271884395125,
+      "maxScore": 0.44849271884395125,
+      "firstRecalledAt": "2026-05-19T11:55:33.621Z",
+      "lastRecalledAt": "2026-05-19T11:55:33.621Z",
+      "queryHashes": [
+        "fda567935d4c"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "cani-vision",
+        "cani-vision-590",
+        "openclaw/workspace",
+        "google-application-credentials",
+        "compositor-express-1",
+        "google-cloud/vision",
+        "api/vision-health",
+        "sesión"
+      ]
+    },
+    "memory:memory/2026-05-13.md:22:35": {
+      "key": "memory:memory/2026-05-13.md:22:35",
+      "path": "memory/2026-05-13.md",
+      "startLine": 22,
+      "endLine": 35,
+      "source": "memory",
+      "snippet": "- Necesario testear otra vez tras el deploy ### Mañana (2026-05-14) — siguientes pasos 1. Push desde local: `cd compositor-express && git push origin deploy` 2. Verificar que Render recompila con los cambios 3. Testear con las mismas fotos que fallaron hoy 4. Ajustar preprocesamiento de imagen si sigue habiendo errores ### Nota: Cron CANI-APP vs CANI-VISION - El cronjob `ec8a1594-64c0-4df3-a91d-f90a4ee75a0b` monitoriza \"CANI-APP\" pero el trabajo real hoy es con \"CANI-VISION\" - Juan trabaja en el proyecto compositor-express (CANI-VISION) en Render ### Backup automático - Juan pidió backup diario automático a las 00:00 (Pendiente de implementar como cron job)",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.43349611376422925,
+      "maxScore": 0.43349611376422925,
+      "firstRecalledAt": "2026-05-19T11:55:33.621Z",
+      "lastRecalledAt": "2026-05-19T11:55:33.621Z",
+      "queryHashes": [
+        "fda567935d4c"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "backup",
+        "compositor-express",
+        "cani-app",
+        "cani-vision",
+        "necesario",
+        "testear",
+        "otra",
+        "vez"
+      ]
+    }
+  }
+}
