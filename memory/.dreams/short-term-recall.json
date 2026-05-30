@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-25T02:10:33.323Z",
+  "updatedAt": "2026-05-27T02:25:43.309Z",
   "entries": {
     "memory:memory/2026-05-13.md:1:30": {
       "key": "memory:memory/2026-05-13.md:1:30",
@@ -9,13 +9,13 @@
       "endLine": 30,
       "source": "memory",
       "snippet": "## Sesión — 2026-05-13 ### CANI-VISION — Google Vision configurado ✅ - Proyecto Google Cloud: **cani-vision** - Service Account: `cani-vision-590@cani-vision.iam.gserviceaccount.com` - JSON key guardado en: `/data/.openclaw/workspace/.keys/google-vision-cani-vision.json` - API Vision habilitada en Google Cloud ✅ - Variable `GOOGLE_APPLICATION_CREDENTIALS` configurada en Render (compositor-express-1) ✅ - Dependencia `@google-cloud/vision` instalada y desplegada ✅ - Endpoint `/api/vision-health` confirma que vision está activo ✅ ### Cambios de código pendientes de desplegar - **OCR pipeline:** Google Vision ahora es el motor principal (antes Tesseract) - **Prompt mejorado:** ejemplos de corr",
-      "recallCount": 10,
+      "recallCount": 16,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 3.8946492176337384,
+      "totalScore": 6.138488082198634,
       "maxScore": 0.44849271884395125,
       "firstRecalledAt": "2026-05-19T11:55:33.621Z",
-      "lastRecalledAt": "2026-05-25T02:10:33.323Z",
+      "lastRecalledAt": "2026-05-27T02:25:43.309Z",
       "queryHashes": [
         "fda567935d4c",
         "41d5b04c6532",
@@ -26,14 +26,22 @@
         "2a610916d899",
         "c063c3b92c91",
         "16861cffdf69",
-        "7252e52e227e"
+        "7252e52e227e",
+        "2065dc89dace",
+        "618e1e908fc0",
+        "a80c202e0116",
+        "ce1c8fa6234d",
+        "0da3eaa75be8",
+        "3710d512cf4b"
       ],
       "recallDays": [
         "2026-05-19",
         "2026-05-22",
         "2026-05-23",
         "2026-05-24",
-        "2026-05-25"
+        "2026-05-25",
+        "2026-05-26",
+        "2026-05-27"
       ],
       "conceptTags": [
         "cani-vision",
@@ -53,13 +61,13 @@
       "endLine": 35,
       "source": "memory",
       "snippet": "- Necesario testear otra vez tras el deploy ### Mañana (2026-05-14) — siguientes pasos 1. Push desde local: `cd compositor-express && git push origin deploy` 2. Verificar que Render recompila con los cambios 3. Testear con las mismas fotos que fallaron hoy 4. Ajustar preprocesamiento de imagen si sigue habiendo errores ### Nota: Cron CANI-APP vs CANI-VISION - El cronjob `ec8a1594-64c0-4df3-a91d-f90a4ee75a0b` monitoriza \"CANI-APP\" pero el trabajo real hoy es con \"CANI-VISION\" - Juan trabaja en el proyecto compositor-express (CANI-VISION) en Render ### Backup automático - Juan pidió backup diario automático a las 00:00 (Pendiente de implementar como cron job)",
-      "recallCount": 14,
+      "recallCount": 20,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 5.553592397915306,
+      "totalScore": 7.83588380728859,
       "maxScore": 0.4491527408361435,
       "firstRecalledAt": "2026-05-19T11:55:33.621Z",
-      "lastRecalledAt": "2026-05-24T10:25:38.083Z",
+      "lastRecalledAt": "2026-05-27T02:25:43.309Z",
       "queryHashes": [
         "fda567935d4c",
         "364891f44e18",
@@ -74,13 +82,21 @@
         "2a610916d899",
         "c063c3b92c91",
         "16861cffdf69",
-        "61f51c2782ad"
+        "61f51c2782ad",
+        "2065dc89dace",
+        "618e1e908fc0",
+        "a80c202e0116",
+        "ce1c8fa6234d",
+        "0da3eaa75be8",
+        "3710d512cf4b"
       ],
       "recallDays": [
         "2026-05-19",
         "2026-05-22",
         "2026-05-23",
-        "2026-05-24"
+        "2026-05-24",
+        "2026-05-26",
+        "2026-05-27"
       ],
       "conceptTags": [
         "backup",
@@ -91,6 +107,102 @@
         "testear",
         "otra",
         "vez"
+      ]
+    },
+    "memory:memory/2026-05-15.md:1:9": {
+      "key": "memory:memory/2026-05-15.md:1:9",
+      "path": "memory/2026-05-15.md",
+      "startLine": 1,
+      "endLine": 9,
+      "source": "memory",
+      "snippet": "- Juan confirmó que quiere usar GPT-5.4 como modelo en esta sesión. - Se creó la skill `freebeat` en `/data/.openclaw/workspace/skills/freebeat/` para guiar creación profesional de videos musicales con Freebeat a partir de MP3/letra, incluyendo prompts por secciones y tips de foros en `references/forum-tips.md`. - Juan quiere un flujo donde entrega canción MP3 y letra, y recibe guía paso a paso para producir videos musicales profesionales por partes. - Se investigó Wan para video: OpenClaw soporta modelos Wan vía providers como qwen/alibaba/fal/together; la recomendación para Juan es priorizar uso por API antes que montaje local. - Preferencias/tema activo: Juan está comparando opciones de I",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.5069421768188476,
+      "maxScore": 0.26693213582038877,
+      "firstRecalledAt": "2026-05-27T02:10:40.692Z",
+      "lastRecalledAt": "2026-05-27T02:25:43.309Z",
+      "queryHashes": [
+        "0da3eaa75be8",
+        "3710d512cf4b"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "gpt",
+        "gpt-5.4",
+        "mp3/letra",
+        "references/forum-tips.md",
+        "qwen/alibaba/fal/together",
+        "preferencias/tema",
+        "juan",
+        "confirmó"
+      ]
+    },
+    "memory:memory/2026-05-15.md:8:15": {
+      "key": "memory:memory/2026-05-15.md:8:15",
+      "path": "memory/2026-05-15.md",
+      "startLine": 8,
+      "endLine": 15,
+      "source": "memory",
+      "snippet": "- Juan quiere un flujo donde entrega canción MP3 y letra, y recibe guía paso a paso para producir videos musicales profesionales por partes. - Se investigó Wan para video: OpenClaw soporta modelos Wan vía providers como qwen/alibaba/fal/together; la recomendación para Juan es priorizar uso por API antes que montaje local. - Preferencias/tema activo: Juan está comparando opciones de IA de video baratas y buenas para clips musicales, con interés en costes aproximados por minuto para Wan, Seedance, Hailuo, Kling y Veo. - Juan quiere usar OpenClaw para crear vídeos TikTok de 1 minuto: da una foto de avatar + MP3 + letra, y quiere que el personaje cante en un video musical con lip sync. Quiere us",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4554804265499115,
+      "maxScore": 0.23108556270599365,
+      "firstRecalledAt": "2026-05-27T02:10:40.692Z",
+      "lastRecalledAt": "2026-05-27T02:25:43.309Z",
+      "queryHashes": [
+        "0da3eaa75be8",
+        "3710d512cf4b"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "qwen/alibaba/fal/together",
+        "preferencias/tema",
+        "juan",
+        "quiere",
+        "flujo",
+        "donde",
+        "entrega",
+        "canción"
+      ]
+    },
+    "memory:memory/2026-05-15.md:14:17": {
+      "key": "memory:memory/2026-05-15.md:14:17",
+      "path": "memory/2026-05-15.md",
+      "startLine": 14,
+      "endLine": 17,
+      "source": "memory",
+      "snippet": "- Modelos más mencionados: Wan (tests baratos), Kling (calidad premium, más caro), Seedance (mejor relación calidad/precio actualmente), Hailuo (buen valor, algo más lento). - Lip sync fino para personaje cantando: la mayoría no lo resuelve solo con OpenClaw, usa otra capa especializada (lip sync talking head/singing sync) después de generar el visual. - Juan pregunta qué herramientas necesitaría conectar. Mínimo práctico: una herramienta de generación de video (Freebeat/Wan/Seedance/Kling/Hailuo) + herramienta de lip sync + editor final. - Juan pregunta qué modelo soy. Le confirmé que soy Superagente en OpenClaw, funcionando con GPT-5.4 (OpenAI Codex) desde que él me lo pidió.",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.46860422492027276,
+      "maxScore": 0.23898631930351255,
+      "firstRecalledAt": "2026-05-27T02:10:40.692Z",
+      "lastRecalledAt": "2026-05-27T02:25:43.309Z",
+      "queryHashes": [
+        "0da3eaa75be8",
+        "3710d512cf4b"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "gpt",
+        "openai",
+        "calidad/precio",
+        "head/singing",
+        "gpt-5.4",
+        "modelos",
+        "más",
+        "mencionados"
       ]
     }
   }
